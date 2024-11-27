@@ -1,5 +1,6 @@
 package com.management.kbbs.service;
 
+import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -18,54 +20,50 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    // 新增書籍
-    public Book addBook(Book book) {
-        if (book.getIsbn() != null && bookRepository.existsByIsbn(book.getIsbn())) {
-            throw new IllegalArgumentException("ISBN 已存在，無法新增書籍。");
-        }
-        return bookRepository.save(book);
+    // Create a new book
+    public BookDTO createBook(BookDTO bookDTO) {
+        Book book = bookDTO.toEntity(); // Convert DTO to Entity
+        Book savedBook = bookRepository.save(book); // Save to the database
+        return BookDTO.fromEntity(savedBook); // Convert saved Entity back to DTO
     }
 
-    // 查詢所有書籍
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    // Get all books
+    public List<BookDTO> getAllBooks() {
+        List<Book> books = bookRepository.findAll(); // Fetch all books from the database
+        return books.stream()
+                .map(BookDTO::fromEntity) // Convert each Entity to DTO
+                .collect(Collectors.toList());
     }
 
-    // 根據 ID 查詢書籍
-    public Book getBookById(Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("找不到指定 ID 的書籍：" + id));
+    // Get a book by its ID
+    public BookDTO getBookById(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id)); // Handle not found
+        return BookDTO.fromEntity(book); // Convert to DTO
     }
 
-    // 更新書籍
-    public Book updateBook(Long id, Book updatedBook) {
-        Book existingBook = getBookById(id); // 確保書籍存在
+    // Update a book
+    public BookDTO updateBook(Long id, BookDTO bookDTO) {
+        // Find the book to update
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id));
 
-        // 更新資料
-        existingBook.setTitle(updatedBook.getTitle());
-        existingBook.setAuthor(updatedBook.getAuthor());
-        existingBook.setIsbn(updatedBook.getIsbn());
-        existingBook.setPublishDate(updatedBook.getPublishDate());
-        existingBook.setStock(updatedBook.getStock());
+        // Update fields from DTO
+        existingBook.setTitle(bookDTO.getTitle());
+        existingBook.setAuthor(bookDTO.getAuthor());
+        existingBook.setIsbn(bookDTO.getIsbn());
+        existingBook.setPublishDate(bookDTO.getPublishDate());
+        existingBook.setStock(bookDTO.getStock());
 
-        return bookRepository.save(existingBook);
+        Book updatedBook = bookRepository.save(existingBook); // Save updated book
+        return BookDTO.fromEntity(updatedBook); // Convert to DTO
     }
 
-    // 刪除書籍
+    // Delete a book
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new IllegalArgumentException("找不到指定 ID 的書籍，無法刪除：" + id);
+            throw new RuntimeException("Book not found with ID: " + id); // Handle not found
         }
-        bookRepository.deleteById(id);
-    }
-
-    // 根據關鍵字查詢書籍 (書名包含特定字串)
-    public List<Book> searchBooksByTitle(String keyword) {
-        return bookRepository.findByTitleContaining(keyword);
-    }
-
-    // 查詢存貨大於指定數量的書籍
-    public List<Book> getBooksByStockGreaterThan(Integer stock) {
-        return bookRepository.findByStockGreaterThan(stock);
+        bookRepository.deleteById(id); // Delete the book
     }
 }

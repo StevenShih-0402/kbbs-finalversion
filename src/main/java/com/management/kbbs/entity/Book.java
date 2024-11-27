@@ -11,25 +11,25 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String author;
 
-    @Column(unique = true, length = 20)
+    @Column(unique = true)
     private String isbn;
 
-    @Column(name = "publish_date")
     private LocalDate publishDate;
 
-    @Column(columnDefinition = "NUMBER DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "NUMBER DEFAULT 0")
     private Integer stock;
 
-    // Constructors
+    // Default constructor required by JPA
     public Book() {
     }
 
+    // Parameterized constructor for easier testing or object creation
     public Book(String title, String author, String isbn, LocalDate publishDate, Integer stock) {
         this.title = title;
         this.author = author;
@@ -85,18 +85,5 @@ public class Book {
 
     public void setStock(Integer stock) {
         this.stock = stock;
-    }
-
-    // toString method (optional, for debugging/logging purposes)
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", isbn='" + isbn + '\'' +
-                ", publishDate=" + publishDate +
-                ", stock=" + stock +
-                '}';
     }
 }
