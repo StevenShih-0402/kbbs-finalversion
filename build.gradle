@@ -22,6 +22,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'javax.persistence:javax.persistence-api:2.2'
 	implementation 'org.hibernate.validator:hibernate-validator:6.2.3.Final'
+	implementation 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -30,4 +32,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	options.annotationProcessorPath = configurations.annotationProcessor
 }

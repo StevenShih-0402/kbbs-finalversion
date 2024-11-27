@@ -1,6 +1,6 @@
 package com.management.kbbs.dto;
 
-public class UserDTO {
+public class MemberDTO {
 
     private Long id;
     private String name;

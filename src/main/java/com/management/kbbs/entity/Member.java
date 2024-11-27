@@ -2,10 +2,10 @@ package com.management.kbbs.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
-public class User {
+@Table(name = "Users")
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

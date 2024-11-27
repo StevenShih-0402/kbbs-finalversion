@@ -1,8 +1,9 @@
 package com.management.kbbs.service;
 
-import com.management.kbbs.dto.UserDTO;
-import com.management.kbbs.entity.User;
-import com.management.kbbs.repository.UserRepository;
+import com.management.kbbs.dto.MemberDTO;
+import com.management.kbbs.entity.Member;
+import com.management.kbbs.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,33 +12,33 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+@RequiredArgsConstructor
+public class MemberService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private MemberRepository userRepository;
 
     // 創建用戶
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = new User();
+    public MemberDTO createUser(MemberDTO userDTO) {
+        Member user = new Member();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
 
-        User savedUser = userRepository.save(user);
+        Member savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }
 
     // 查詢所有用戶
-    public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public List<MemberDTO> getAllUsers() {
+        List<Member> users = userRepository.findAll();
         return users.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     // 根據ID查詢單一用戶
-    public UserDTO getUserById(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+    public MemberDTO getUserById(Long id) {
+        Optional<Member> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             return convertToDTO(userOptional.get());
         } else {
@@ -46,15 +47,15 @@ public class UserService {
     }
 
     // 更新用戶
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-        Optional<User> userOptional = userRepository.findById(id);
+    public MemberDTO updateUser(Long id, MemberDTO userDTO) {
+        Optional<Member> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
+            Member user = userOptional.get();
             user.setName(userDTO.getName());
             user.setEmail(userDTO.getEmail());
             user.setPhone(userDTO.getPhone());
 
-            User updatedUser = userRepository.save(user);
+            Member updatedUser = userRepository.save(user);
             return convertToDTO(updatedUser);
         } else {
             throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
@@ -63,7 +64,7 @@ public class UserService {
 
     // 刪除用戶
     public void deleteUser(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<Member> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             userRepository.deleteById(id);
         } else {
@@ -72,8 +73,8 @@ public class UserService {
     }
 
     // 將 User 轉換為 UserDTO
-    private UserDTO convertToDTO(User user) {
-        UserDTO userDTO = new UserDTO();
+    private MemberDTO convertToDTO(Member user) {
+        MemberDTO userDTO = new MemberDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());

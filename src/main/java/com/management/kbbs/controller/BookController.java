@@ -2,6 +2,7 @@ package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.service.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     // Create a new book
     @PostMapping
