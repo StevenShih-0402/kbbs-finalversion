@@ -2,8 +2,8 @@ package com.management.kbbs.service;
 
 import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.entity.Book;
+import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.BookRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,56 +16,93 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookService {
 
-    private final BookRepository bookRepository;
+    private BookRepository bookRepository;
 
-    // Create a new book
+    // 新增書籍
     public BookDTO createBook(BookDTO bookDTO) {
-//        Book book = bookDTO.toEntity(); // Convert DTO to Entity
-//        Book savedBook = bookRepository.save(book); // Save to the database
-//        return BookDTO.fromEntity(savedBook); // Convert saved Entity back to DTO
-        return null;
+        if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
+            throw new IllegalArgumentException("書籍已存在 (ISBN 重複)。");
+        }
+        Book book = convertToEntity(bookDTO);
+        Book savedBook = bookRepository.save(book);
+        return convertToDTO(savedBook);
     }
 
-    // Get all books
+    // 查詢所有書籍
     public List<BookDTO> getAllBooks() {
-        List<Book> books = bookRepository.findAll(); // Fetch all books from the database
-//        return books.stream()
-//                .map(BookDTO::fromEntity) // Convert each Entity to DTO
-//                .collect(Collectors.toList());
-        return null;
+        return bookRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Get a book by its ID
+    // 根據 ID 查詢書籍
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id)); // Handle not found
-//        return BookDTO.fromEntity(book); // Convert to DTO
-        return null;
+                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
+        return convertToDTO(book);
     }
 
-    // Update a book
+    // 更新書籍
     public BookDTO updateBook(Long id, BookDTO bookDTO) {
-        // Find the book to update
         Book existingBook = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
 
-        // Update fields from DTO
         existingBook.setTitle(bookDTO.getTitle());
         existingBook.setAuthor(bookDTO.getAuthor());
         existingBook.setIsbn(bookDTO.getIsbn());
         existingBook.setPublishDate(bookDTO.getPublishDate());
         existingBook.setStock(bookDTO.getStock());
 
-        Book updatedBook = bookRepository.save(existingBook); // Save updated book
-//        return BookDTO.fromEntity(updatedBook); // Convert to DTO
-        return null;
+        Book updatedBook = bookRepository.save(existingBook);
+        return convertToDTO(updatedBook);
     }
 
-    // Delete a book
+    // 刪除書籍
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new RuntimeException("Book not found with ID: " + id); // Handle not found
+            throw new IllegalArgumentException("未找到指定 ID 的書籍。");
         }
-        bookRepository.deleteById(id); // Delete the book
+        bookRepository.deleteById(id);
+    }
+
+    // 根據關鍵字查詢書籍 (書名包含特定字串)
+    public List<BookDTO> searchBooksByTitle(String keyword) {
+        return bookRepository.findByTitleContaining(keyword)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 查詢存貨大於指定數量的書籍
+    public List<BookDTO> getBooksByStockGreaterThan(Integer stock) {
+        return bookRepository.findByStockGreaterThan(stock)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Entity -> DTO
+    private BookDTO convertToDTO(Book book) {
+        return new BookDTO(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getIsbn(),
+                book.getPublishDate(),
+                book.getStock()
+        );
+    }
+
+    // DTO -> Entity
+    private Book convertToEntity(BookDTO bookDTO) {
+        return new Book(
+                bookDTO.getId(),
+                bookDTO.getTitle(),
+                bookDTO.getAuthor(),
+                bookDTO.getIsbn(),
+                bookDTO.getPublishDate(),
+                bookDTO.getStock()
+        );
     }
 }

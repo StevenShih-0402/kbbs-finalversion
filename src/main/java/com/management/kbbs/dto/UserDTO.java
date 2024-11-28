@@ -1,10 +1,10 @@
 package com.management.kbbs.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class UserDTO {
 
     private Long id;
@@ -44,4 +44,5 @@ public class UserDTO {
 //    public void setPhone(String phone) {
 //        this.phone = phone;
 //    }
+
 }

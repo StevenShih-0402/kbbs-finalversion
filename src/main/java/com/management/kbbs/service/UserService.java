@@ -19,51 +19,47 @@ public class UserService {
 
     // 創建用戶
     public UserDTO createUser(UserDTO userDTO) {
-//        User user = new User();
-//        user.setName(userDTO.getName());
-//        user.setEmail(userDTO.getEmail());
-//        user.setPhone(userDTO.getPhone());
-//
-//        User savedUser = userRepository.save(user);
-//        return convertToDTO(savedUser);
-        return null;
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+
+        User savedUser = userRepository.save(user);
+        return convertToDTO(savedUser);
     }
 
     // 查詢所有用戶
     public List<UserDTO> getAllUsers() {
-//        List<User> users = userRepository.findAll();
-//        return users.stream()
-//                .map(this::convertToDTO)
-//                .collect(Collectors.toList());
-        return null;
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     // 根據ID查詢單一用戶
     public UserDTO getUserById(Long id) {
-//        Optional<User> userOptional = userRepository.findById(id);
-//        if (userOptional.isPresent()) {
-//            return convertToDTO(userOptional.get());
-//        } else {
-//            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
-//        }
-        return null;
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            return convertToDTO(userOptional.get());
+        } else {
+            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
+        }
     }
 
     // 更新用戶
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-//        Optional<User> userOptional = userRepository.findById(id);
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            user.setName(userDTO.getName());
-//            user.setEmail(userDTO.getEmail());
-//            user.setPhone(userDTO.getPhone());
-//
-//            User updatedUser = userRepository.save(user);
-//            return convertToDTO(updatedUser);
-//        } else {
-//            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
-//        }
-        return null;
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setName(userDTO.getName());
+            user.setEmail(userDTO.getEmail());
+            user.setPhone(userDTO.getPhone());
+
+            User updatedUser = userRepository.save(user);
+            return convertToDTO(updatedUser);
+        } else {
+            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
+        }
     }
 
     // 刪除用戶
@@ -78,12 +74,11 @@ public class UserService {
 
     // 將 User 轉換為 UserDTO
     private UserDTO convertToDTO(User user) {
-//        UserDTO userDTO = new UserDTO();
-//        userDTO.setId(user.getId());
-//        userDTO.setName(user.getName());
-//        userDTO.setEmail(user.getEmail());
-//        userDTO.setPhone(user.getPhone());
-//        return userDTO;
-        return null;
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPhone(user.getPhone());
+        return userDTO;
     }
 }

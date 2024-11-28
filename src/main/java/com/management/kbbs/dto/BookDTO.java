@@ -1,12 +1,12 @@
 package com.management.kbbs.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookDTO {
 
     private Long id;
@@ -15,8 +15,6 @@ public class BookDTO {
     private String isbn;
     private LocalDate publishDate;
     private Integer stock;
-
-
 
 
     // Getters and Setters
