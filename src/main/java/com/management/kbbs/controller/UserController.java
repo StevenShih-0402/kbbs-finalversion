@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final @Lazy UserService userService;
+    private final UserService userService;
 
     // 創建用戶
     @PostMapping

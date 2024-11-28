@@ -20,24 +20,27 @@ public class BookService {
 
     // Create a new book
     public BookDTO createBook(BookDTO bookDTO) {
-        Book book = bookDTO.toEntity(); // Convert DTO to Entity
-        Book savedBook = bookRepository.save(book); // Save to the database
-        return BookDTO.fromEntity(savedBook); // Convert saved Entity back to DTO
+//        Book book = bookDTO.toEntity(); // Convert DTO to Entity
+//        Book savedBook = bookRepository.save(book); // Save to the database
+//        return BookDTO.fromEntity(savedBook); // Convert saved Entity back to DTO
+        return null;
     }
 
     // Get all books
     public List<BookDTO> getAllBooks() {
         List<Book> books = bookRepository.findAll(); // Fetch all books from the database
-        return books.stream()
-                .map(BookDTO::fromEntity) // Convert each Entity to DTO
-                .collect(Collectors.toList());
+//        return books.stream()
+//                .map(BookDTO::fromEntity) // Convert each Entity to DTO
+//                .collect(Collectors.toList());
+        return null;
     }
 
     // Get a book by its ID
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id)); // Handle not found
-        return BookDTO.fromEntity(book); // Convert to DTO
+//        return BookDTO.fromEntity(book); // Convert to DTO
+        return null;
     }
 
     // Update a book
@@ -54,7 +57,8 @@ public class BookService {
         existingBook.setStock(bookDTO.getStock());
 
         Book updatedBook = bookRepository.save(existingBook); // Save updated book
-        return BookDTO.fromEntity(updatedBook); // Convert to DTO
+//        return BookDTO.fromEntity(updatedBook); // Convert to DTO
+        return null;
     }
 
     // Delete a book
