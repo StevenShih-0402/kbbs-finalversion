@@ -32,7 +32,7 @@ public class Book {
     private LocalDate publishDate;
 
     @Column(nullable = false, columnDefinition = "NUMBER DEFAULT 0")
-    private Integer stock;
+    private int stock;
 
     // Getters and Setters
 //    public Long getId() {

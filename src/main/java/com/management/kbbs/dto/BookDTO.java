@@ -5,8 +5,6 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class BookDTO {
 
     private Long id;
@@ -66,16 +64,16 @@ public class BookDTO {
 //        this.stock = stock;
 //    }
 
-    @Override
-    public String toString() {
-        return "BookDTO{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", isbn='" + isbn + '\'' +
-                ", publishDate=" + publishDate +
-                ", stock=" + stock +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "BookDTO{" +
+//                "id=" + id +
+//                ", title='" + title + '\'' +
+//                ", author='" + author + '\'' +
+//                ", isbn='" + isbn + '\'' +
+//                ", publishDate=" + publishDate +
+//                ", stock=" + stock +
+//                '}';
+//    }
 }
 

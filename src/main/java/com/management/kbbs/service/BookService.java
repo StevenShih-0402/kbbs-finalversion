@@ -1,6 +1,7 @@
 package com.management.kbbs.service;
 
 import com.management.kbbs.dto.BookDTO;
+import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.BookRepository;
@@ -16,14 +17,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookService {
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
     // 新增書籍
     public BookDTO createBook(BookDTO bookDTO) {
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
             throw new IllegalArgumentException("書籍已存在 (ISBN 重複)。");
         }
-        Book book = convertToEntity(bookDTO);
+//        Book book = convertToEntity(bookDTO);
+        Book book = new Book();
+        book.setAuthor(bookDTO.getAuthor());
+        book.setTitle(bookDTO.getTitle());
+        book.setIsbn(bookDTO.getIsbn());
+        book.setPublishDate(bookDTO.getPublishDate());
+        book.setStock(bookDTO.getStock());
+
         Book savedBook = bookRepository.save(book);
         return convertToDTO(savedBook);
     }
@@ -31,9 +39,9 @@ public class BookService {
     // 查詢所有書籍
     public List<BookDTO> getAllBooks() {
         return bookRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                            .stream()
+                            .map(this::convertToDTO)
+                            .collect(Collectors.toList());
     }
 
     // 根據 ID 查詢書籍
@@ -66,7 +74,7 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    // 根據關鍵字查詢書籍 (書名包含特定字串)
+//    // 根據關鍵字查詢書籍 (書名包含特定字串)
     public List<BookDTO> searchBooksByTitle(String keyword) {
         return bookRepository.findByTitleContaining(keyword)
                 .stream()
@@ -74,7 +82,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    // 查詢存貨大於指定數量的書籍
+//    // 查詢存貨大於指定數量的書籍
     public List<BookDTO> getBooksByStockGreaterThan(Integer stock) {
         return bookRepository.findByStockGreaterThan(stock)
                 .stream()
@@ -84,25 +92,35 @@ public class BookService {
 
     // Entity -> DTO
     private BookDTO convertToDTO(Book book) {
-        return new BookDTO(
-                book.getId(),
-                book.getTitle(),
-                book.getAuthor(),
-                book.getIsbn(),
-                book.getPublishDate(),
-                book.getStock()
-        );
+//        return new BookDTO(
+//                book.getId(),
+//                book.getTitle(),
+//                book.getAuthor(),
+//                book.getIsbn(),
+//                book.getPublishDate(),
+//                book.getStock()
+//        );
+        BookDTO bookDTO = new BookDTO();
+
+        bookDTO.setId(book.getId());
+        bookDTO.setTitle(book.getTitle());
+        bookDTO.setAuthor(book.getAuthor());
+        bookDTO.setIsbn(book.getIsbn());
+        bookDTO.setPublishDate(book.getPublishDate());
+        bookDTO.setStock(book.getStock());
+
+        return bookDTO;
     }
 
     // DTO -> Entity
-    private Book convertToEntity(BookDTO bookDTO) {
-        return new Book(
-                bookDTO.getId(),
-                bookDTO.getTitle(),
-                bookDTO.getAuthor(),
-                bookDTO.getIsbn(),
-                bookDTO.getPublishDate(),
-                bookDTO.getStock()
-        );
-    }
+//    private Book convertToEntity(BookDTO bookDTO) {
+//        return new Book(
+//                bookDTO.getId(),
+//                bookDTO.getTitle(),
+//                bookDTO.getAuthor(),
+//                bookDTO.getIsbn(),
+//                bookDTO.getPublishDate(),
+//                bookDTO.getStock()
+//        );
+//    }
 }

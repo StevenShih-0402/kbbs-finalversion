@@ -3,7 +3,6 @@ package com.management.kbbs.controller;
 import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.service.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
 
-    private BookService bookService;
+    private final BookService bookService;
 
     // 新增書籍
     @PostMapping

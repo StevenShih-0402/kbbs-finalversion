@@ -1,6 +1,5 @@
 package com.management.kbbs.entity;
 
-import com.management.kbbs.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
