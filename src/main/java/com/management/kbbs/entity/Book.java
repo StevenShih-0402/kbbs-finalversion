@@ -31,6 +31,6 @@ public class Book {
 
     private LocalDate publishDate;
 
-    @Column(nullable = false, columnDefinition = "NUMBER DEFAULT 0")
-    private int stock;
+    @Column(nullable = false)
+    private String collection = "館內"; // 館藏狀態，預設值為 "館內"
 }

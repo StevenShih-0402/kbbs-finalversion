@@ -57,11 +57,4 @@ public class BookController {
         List<BookDTO> books = bookService.searchBooksByTitle(keyword);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
-
-    // 查詢存貨大於指定數量的書籍
-    @GetMapping("/stock")
-    public ResponseEntity<List<BookDTO>> getBooksByStockGreaterThan(@RequestParam Integer stock) {
-        List<BookDTO> books = bookService.getBooksByStockGreaterThan(stock);
-        return new ResponseEntity<>(books, HttpStatus.OK);
-    }
 }

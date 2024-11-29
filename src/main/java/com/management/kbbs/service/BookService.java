@@ -25,7 +25,6 @@ public class BookService {
         book.setTitle(bookDTO.getTitle());
         book.setIsbn(bookDTO.getIsbn());
         book.setPublishDate(bookDTO.getPublishDate());
-        book.setStock(bookDTO.getStock());
 
         Book savedBook = bookRepository.save(book);
         return convertToDTO(savedBook);
@@ -55,7 +54,7 @@ public class BookService {
         existingBook.setAuthor(bookDTO.getAuthor());
         existingBook.setIsbn(bookDTO.getIsbn());
         existingBook.setPublishDate(bookDTO.getPublishDate());
-        existingBook.setStock(bookDTO.getStock());
+        existingBook.setCollection(bookDTO.getCollection());
 
         Book updatedBook = bookRepository.save(existingBook);
         return convertToDTO(updatedBook);
@@ -77,14 +76,6 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-//    // 查詢存貨大於指定數量的書籍
-    public List<BookDTO> getBooksByStockGreaterThan(Integer stock) {
-        return bookRepository.findByStockGreaterThan(stock)
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
     // Entity -> DTO
     private BookDTO convertToDTO(Book book) {
         BookDTO bookDTO = new BookDTO();
@@ -94,7 +85,7 @@ public class BookService {
         bookDTO.setAuthor(book.getAuthor());
         bookDTO.setIsbn(book.getIsbn());
         bookDTO.setPublishDate(book.getPublishDate());
-        bookDTO.setStock(book.getStock());
+        bookDTO.setCollection(book.getCollection());
 
         return bookDTO;
     }
