@@ -28,11 +28,6 @@ public class GlobalExceptionHandler {
 
     // 捕捉所有異常
     @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public String handleGeneralException(Exception ex, Model model) {
-//        model.addAttribute("error", "An unexpected error occurred: " + ex.getMessage());
-//        return "error/generalError";
-//    }
     public ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + ex.getMessage());

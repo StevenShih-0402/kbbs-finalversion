@@ -4,7 +4,6 @@ import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

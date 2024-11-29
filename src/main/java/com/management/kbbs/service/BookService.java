@@ -1,16 +1,12 @@
 package com.management.kbbs.service;
 
 import com.management.kbbs.dto.BookDTO;
-import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.entity.Book;
-import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +20,6 @@ public class BookService {
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
             throw new IllegalArgumentException("書籍已存在 (ISBN 重複)。");
         }
-//        Book book = convertToEntity(bookDTO);
         Book book = new Book();
         book.setAuthor(bookDTO.getAuthor());
         book.setTitle(bookDTO.getTitle());
@@ -92,14 +87,6 @@ public class BookService {
 
     // Entity -> DTO
     private BookDTO convertToDTO(Book book) {
-//        return new BookDTO(
-//                book.getId(),
-//                book.getTitle(),
-//                book.getAuthor(),
-//                book.getIsbn(),
-//                book.getPublishDate(),
-//                book.getStock()
-//        );
         BookDTO bookDTO = new BookDTO();
 
         bookDTO.setId(book.getId());
@@ -111,16 +98,4 @@ public class BookService {
 
         return bookDTO;
     }
-
-    // DTO -> Entity
-//    private Book convertToEntity(BookDTO bookDTO) {
-//        return new Book(
-//                bookDTO.getId(),
-//                bookDTO.getTitle(),
-//                bookDTO.getAuthor(),
-//                bookDTO.getIsbn(),
-//                bookDTO.getPublishDate(),
-//                bookDTO.getStock()
-//        );
-//    }
 }
