@@ -13,6 +13,5 @@ public class BookDTO {
     private String isbn;
     private LocalDate publishDate;
     private Integer stock;
-
 }
 
