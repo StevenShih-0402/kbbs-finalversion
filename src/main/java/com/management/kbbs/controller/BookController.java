@@ -57,4 +57,10 @@ public class BookController {
         List<BookDTO> books = bookService.searchBooksByTitle(keyword);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
+
+
+//    @GetMapping("/popular")
+//    public ResponseEntity<List<BookDTO>> getPopularBooks() {
+//        return ResponseEntity.ok(bookService.getPopularBooks());
+//    }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,13 +69,24 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-//    // 根據關鍵字查詢書籍 (書名包含特定字串)
+    // 根據關鍵字查詢書籍 (書名包含特定字串)
     public List<BookDTO> searchBooksByTitle(String keyword) {
         return bookRepository.findByTitleContaining(keyword)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+//    public List<BookDTO> getPopularBooks() {
+//        Optional<Object[]> result = bookRepository.findPopularBooks();
+//        return result.stream()
+//                .map(record -> {
+//                    Book book = (Book) record[0];
+//                    Long borrowCount = (Long) record[1];
+//                    return convertToDTO(book);
+//                })
+//                .collect(Collectors.toList());
+//    }
 
     // Entity -> DTO
     private BookDTO convertToDTO(Book book) {

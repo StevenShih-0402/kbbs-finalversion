@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     // 根據書名進行模糊查詢
     Optional<Book> findByTitleContaining(String title);
+
+//    @Query("SELECT b, COUNT(l.id) AS borrowCount " +
+//            "FROM LoanRecords l JOIN l.book b " +
+//            "GROUP BY b " +
+//            "ORDER BY borrowCount DESC")
+//    Optional<Object[]> findPopularBooks();
 }

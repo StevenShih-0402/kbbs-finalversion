@@ -1,11 +1,8 @@
 package com.management.kbbs.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
 

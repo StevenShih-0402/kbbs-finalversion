@@ -14,4 +14,3 @@ public class BookDTO {
     private LocalDate publishDate;
     private String collection;
 }
-
