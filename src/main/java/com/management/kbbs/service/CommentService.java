@@ -2,6 +2,7 @@ package com.management.kbbs.service;
 
 import com.management.kbbs.dto.CommentDTO;
 import com.management.kbbs.dto.CommentRequestDTO;
+import com.management.kbbs.dto.CommentSearchDTO;
 import com.management.kbbs.dto.CommentUpdateDTO;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.Comment;
@@ -72,19 +73,19 @@ public class CommentService {
     }
 
     // 查詢特定書籍獲得的評論
-    public List<CommentDTO> getCommentsByBookId(Long bookId) {
+    public List<CommentSearchDTO> getCommentsByBookId(Long bookId) {
         List<Comment> comments = commentRepository.findByBookId(bookId);
         return comments.stream()
-                       .map(this::convertToDTO)
+                       .map(this::convertToSearchDTO)
                        .collect(Collectors.toList());
     }
 
 
     // 查詢特定用戶留下的評論
-    public List<CommentDTO> getCommentsByUserId(Long userId) {
+    public List<CommentSearchDTO> getCommentsByUserId(Long userId) {
         List<Comment> comments = commentRepository.findByUserId(userId);
         return comments.stream()
-                       .map(this::convertToDTO)
+                       .map(this::convertToSearchDTO)
                        .collect(Collectors.toList());
     }
 
@@ -122,5 +123,20 @@ public class CommentService {
     private void editComment(Comment existingComment, CommentUpdateDTO updateDTO){
         existingComment.setContent(updateDTO.getContent());
         existingComment.setRating(updateDTO.getRating());
+    }
+
+    // 用 Book / User 的 id 查詢評論的資料轉換
+    private CommentSearchDTO convertToSearchDTO(Comment comment){
+        CommentSearchDTO searchDTO = new CommentSearchDTO();
+
+        searchDTO.setId(comment.getId());
+        searchDTO.setUserName(comment.getUser().getName());
+        searchDTO.setBookTitle(comment.getBook().getTitle());
+        searchDTO.setBookAuthor(comment.getBook().getAuthor());
+        searchDTO.setContent(comment.getContent());
+        searchDTO.setRating(comment.getRating());
+        searchDTO.setCreatedAt(comment.getCreatedAt());
+
+        return searchDTO;
     }
 }

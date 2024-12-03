@@ -2,6 +2,7 @@ package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.CommentDTO;
 import com.management.kbbs.dto.CommentRequestDTO;
+import com.management.kbbs.dto.CommentSearchDTO;
 import com.management.kbbs.dto.CommentUpdateDTO;
 import com.management.kbbs.service.CommentService;
 
@@ -57,15 +58,15 @@ public class CommentController {
 
     // 查詢特定書籍獲得的評論
     @GetMapping("/books/{bookId}")
-    public ResponseEntity<List<CommentDTO>> getCommentsByBookId(@PathVariable Long bookId) {
-        List<CommentDTO> comments = commentService.getCommentsByBookId(bookId);
+    public ResponseEntity<List<CommentSearchDTO>> getCommentsByBookId(@PathVariable Long bookId) {
+        List<CommentSearchDTO> comments = commentService.getCommentsByBookId(bookId);
         return ResponseEntity.ok(comments);
     }
 
     // 查詢特定使用者留下的評論
     @GetMapping("/users/{userId}")
-    public ResponseEntity<List<CommentDTO>> getCommentsByUserId(@PathVariable Long userId) {
-        List<CommentDTO> comments = commentService.getCommentsByUserId(userId);
+    public ResponseEntity<List<CommentSearchDTO>> getCommentsByUserId(@PathVariable Long userId) {
+        List<CommentSearchDTO> comments = commentService.getCommentsByUserId(userId);
         return ResponseEntity.ok(comments);
     }
 }

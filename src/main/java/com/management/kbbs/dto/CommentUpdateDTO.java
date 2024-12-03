@@ -1,4 +1,5 @@
 package com.management.kbbs.dto;
+// 更新評論用的 DTO
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
