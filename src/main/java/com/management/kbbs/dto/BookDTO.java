@@ -1,12 +1,12 @@
 package com.management.kbbs.dto;
 
-import lombok.*;
+import com.management.kbbs.entity.Book;
+import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
 public class BookDTO {
-
     private Long id;
     private String title;
     private String author;

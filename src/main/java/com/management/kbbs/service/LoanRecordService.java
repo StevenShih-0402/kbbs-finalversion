@@ -7,8 +7,9 @@ import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,91 +23,126 @@ public class LoanRecordService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    // Create a new loan record
-    public LoanRecordDTO borrowBook(Long userId, Long bookId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + bookId));
+    // 新增借閱紀錄(借書)
+    public LoanRecordDTO borrowBook(LoanRecordDTO loanRecordDTO) {
+        User user = userRepository.findById(loanRecordDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + loanRecordDTO.getUserId()));
+        Book book = bookRepository.findById(loanRecordDTO.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBookId()));
 
         if ("館外".equals(book.getCollection())) {
             throw new RuntimeException("The book is already borrowed.");
         }
 
+        bookIO(book, "館外");
+
+        LoanRecord savedLoanRecord = loanRecordRepository.save(setNewLoadRecord(loanRecordDTO));
+        return convertToDTO(savedLoanRecord);
+    }
+
+    // 更新借閱紀錄(還書)
+    public LoanRecordDTO returnBook(LoanRecordDTO loanRecordDTO) {
+        LoanRecord loanRecord = loanRecordRepository.findById(loanRecordDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + loanRecordDTO.getId()));
+        Book book = bookRepository.findById(loanRecordDTO.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBookId()));
+
+        updateReturnLoadRecord(loanRecord);
+        bookIO(book, "館內");
+
+        LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
+        return convertToDTO(updatedLoanRecord);
+    }
+
+    // 查詢所有借閱紀錄
+    public List<LoanRecordDTO> getAllLoanRecords() {
+        return loanRecordRepository.findAll()
+                                .stream()
+                                .map(this::convertToDTO)
+                                .collect(Collectors.toList());
+    }
+
+    // 查詢單一特定借閱紀錄
+    public LoanRecordDTO getLoanRecordById(Long id) {
+        LoanRecord loanRecord = loanRecordRepository.findById(id)
+                                                    .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
+        return convertToDTO(loanRecord);
+    }
+
+    // 更新借閱紀錄
+    public LoanRecordDTO updateLoanRecord(Long id, LoanRecordDTO loanRecordDTO) {
+        LoanRecord existLoanRecord = loanRecordRepository.findById(id)
+                                                        .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
+
+        editLoadRecord(existLoanRecord, loanRecordDTO);
+
+        LoanRecord updatedLoanRecord = loanRecordRepository.save(existLoanRecord);
+        return convertToDTO(updatedLoanRecord);
+    }
+
+    // 刪除借閱紀錄
+    public void deleteLoanRecord(Long id) {
+        if (!loanRecordRepository.existsById(id)) {
+            throw new RuntimeException("Loan record not found with ID: " + id);
+        }
+        loanRecordRepository.deleteById(id);
+    }
+
+
+
+
+
+
+    // 將 LoanRecord 轉換為 LoanRecordDTO
+    private LoanRecordDTO convertToDTO(LoanRecord loanrecord){
+        LoanRecordDTO loanRecordDTO = new LoanRecordDTO();
+
+        loanRecordDTO.setId(loanrecord.getId());
+        loanRecordDTO.setUserId(loanrecord.getUserId());
+        loanRecordDTO.setBookId(loanrecord.getBookId());
+        loanRecordDTO.setLoanDate(loanrecord.getLoanDate());
+        loanRecordDTO.setDueDate(loanrecord.getDueDate());
+        loanRecordDTO.setReturnDate(loanrecord.getReturnDate());
+        loanRecordDTO.setStatus(loanrecord.getStatus());
+
+        return loanRecordDTO;
+    }
+
+    // 借書的資料轉換
+    private LoanRecord setNewLoadRecord(LoanRecordDTO loanRecordDTO){
         LoanRecord loanRecord = new LoanRecord();
-        loanRecord.setUserId(userId);
-        loanRecord.setBookId(bookId);
+        loanRecord.setUserId(loanRecordDTO.getUserId());
+        loanRecord.setBookId(loanRecordDTO.getBookId());
         loanRecord.setLoanDate(LocalDate.now());
         loanRecord.setDueDate(LocalDate.now().plusWeeks(3));
         loanRecord.setStatus("借閱中");
 
-        book.setCollection("館外");
-        bookRepository.save(book);
-
-        LoanRecord savedLoanRecord = loanRecordRepository.save(loanRecord);
-        return new LoanRecordDTO(savedLoanRecord.getId(), savedLoanRecord.getUserId(), savedLoanRecord.getBookId(),
-                savedLoanRecord.getLoanDate(), savedLoanRecord.getDueDate(), savedLoanRecord.getReturnDate(), savedLoanRecord.getStatus());
+        return loanRecord;
     }
 
-    // Return a book
-    public LoanRecordDTO returnBook(Long loanRecordId) {
-        LoanRecord loanRecord = loanRecordRepository.findById(loanRecordId)
-                .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + loanRecordId));
-        Book book = bookRepository.findById(loanRecord.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecord.getBookId()));
-
+    // 還書的資料轉換
+    private void updateReturnLoadRecord(LoanRecord loanRecord){
         loanRecord.setReturnDate(LocalDate.now());
         if (LocalDate.now().isAfter(loanRecord.getDueDate())) {
             loanRecord.setStatus("逾期歸還");
         } else {
             loanRecord.setStatus("已歸還");
         }
+    }
 
-        book.setCollection("館內");
+    // 更新借閱紀錄的資料轉換
+    private void editLoadRecord(LoanRecord existLoanRecord, LoanRecordDTO loanRecordDTO){
+        existLoanRecord.setUserId(loanRecordDTO.getUserId());
+        existLoanRecord.setBookId(loanRecordDTO.getBookId());
+        existLoanRecord.setLoanDate(loanRecordDTO.getLoanDate());
+        existLoanRecord.setDueDate(loanRecordDTO.getDueDate());
+        existLoanRecord.setReturnDate(loanRecordDTO.getReturnDate());
+        existLoanRecord.setStatus(loanRecordDTO.getStatus());
+    }
+
+    // 變更館藏狀態
+    private void bookIO(Book book, String collectionStatus){
+        book.setCollection(collectionStatus);
         bookRepository.save(book);
-
-        LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
-        return new LoanRecordDTO(updatedLoanRecord.getId(), updatedLoanRecord.getUserId(), updatedLoanRecord.getBookId(),
-                updatedLoanRecord.getLoanDate(), updatedLoanRecord.getDueDate(), updatedLoanRecord.getReturnDate(), updatedLoanRecord.getStatus());
-    }
-
-    // Get all loan records
-    public List<LoanRecordDTO> getAllLoanRecords() {
-        return loanRecordRepository.findAll().stream()
-                .map(record -> new LoanRecordDTO(record.getId(), record.getUserId(), record.getBookId(),
-                        record.getLoanDate(), record.getDueDate(), record.getReturnDate(), record.getStatus()))
-                .collect(Collectors.toList());
-    }
-
-    // Get a loan record by ID
-    public LoanRecordDTO getLoanRecordById(Long id) {
-        LoanRecord loanRecord = loanRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
-        return new LoanRecordDTO(loanRecord.getId(), loanRecord.getUserId(), loanRecord.getBookId(),
-                loanRecord.getLoanDate(), loanRecord.getDueDate(), loanRecord.getReturnDate(), loanRecord.getStatus());
-    }
-
-    // Update a loan record
-    public LoanRecordDTO updateLoanRecord(Long id, LoanRecordDTO loanRecordDTO) {
-        LoanRecord loanRecord = loanRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
-        loanRecord.setUserId(loanRecordDTO.getUserId());
-        loanRecord.setBookId(loanRecordDTO.getBookId());
-        loanRecord.setLoanDate(loanRecordDTO.getLoanDate());
-        loanRecord.setDueDate(loanRecordDTO.getDueDate());
-        loanRecord.setReturnDate(loanRecordDTO.getReturnDate());
-        loanRecord.setStatus(loanRecordDTO.getStatus());
-
-        LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
-        return new LoanRecordDTO(updatedLoanRecord.getId(), updatedLoanRecord.getUserId(), updatedLoanRecord.getBookId(),
-                updatedLoanRecord.getLoanDate(), updatedLoanRecord.getDueDate(), updatedLoanRecord.getReturnDate(), updatedLoanRecord.getStatus());
-    }
-
-    // Delete a loan record
-    public void deleteLoanRecord(Long id) {
-        if (!loanRecordRepository.existsById(id)) {
-            throw new RuntimeException("Loan record not found with ID: " + id);
-        }
-        loanRecordRepository.deleteById(id);
     }
 }

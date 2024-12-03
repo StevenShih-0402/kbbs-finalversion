@@ -1,15 +1,17 @@
 package com.management.kbbs.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
 @Getter
 @Setter
+@Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment {

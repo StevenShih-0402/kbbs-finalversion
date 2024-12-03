@@ -3,11 +3,11 @@ package com.management.kbbs.service;
 import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.repository.BookRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,13 +21,7 @@ public class BookService {
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
             throw new IllegalArgumentException("書籍已存在 (ISBN 重複)。");
         }
-        Book book = new Book();
-        book.setAuthor(bookDTO.getAuthor());
-        book.setTitle(bookDTO.getTitle());
-        book.setIsbn(bookDTO.getIsbn());
-        book.setPublishDate(bookDTO.getPublishDate());
-
-        Book savedBook = bookRepository.save(book);
+        Book savedBook = bookRepository.save(setNewBook(bookDTO));
         return convertToDTO(savedBook);
     }
 
@@ -42,20 +36,16 @@ public class BookService {
     // 根據 ID 查詢書籍
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
+                                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
         return convertToDTO(book);
     }
 
     // 更新書籍
     public BookDTO updateBook(Long id, BookDTO bookDTO) {
         Book existingBook = bookRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
+                                        .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
 
-        existingBook.setTitle(bookDTO.getTitle());
-        existingBook.setAuthor(bookDTO.getAuthor());
-        existingBook.setIsbn(bookDTO.getIsbn());
-        existingBook.setPublishDate(bookDTO.getPublishDate());
-        existingBook.setCollection(bookDTO.getCollection());
+        editBook(existingBook, bookDTO);
 
         Book updatedBook = bookRepository.save(existingBook);
         return convertToDTO(updatedBook);
@@ -77,18 +67,14 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-//    public List<BookDTO> getPopularBooks() {
-//        Optional<Object[]> result = bookRepository.findPopularBooks();
-//        return result.stream()
-//                .map(record -> {
-//                    Book book = (Book) record[0];
-//                    Long borrowCount = (Long) record[1];
-//                    return convertToDTO(book);
-//                })
-//                .collect(Collectors.toList());
-//    }
 
-    // Entity -> DTO
+
+
+
+
+
+
+    // 將 Book 轉換為 BookDTO
     private BookDTO convertToDTO(Book book) {
         BookDTO bookDTO = new BookDTO();
 
@@ -100,5 +86,25 @@ public class BookService {
         bookDTO.setCollection(book.getCollection());
 
         return bookDTO;
+    }
+
+    // 新增書籍的資料轉換
+    private Book setNewBook(BookDTO bookDTO){
+        Book book = new Book();
+        book.setAuthor(bookDTO.getAuthor());
+        book.setTitle(bookDTO.getTitle());
+        book.setIsbn(bookDTO.getIsbn());
+        book.setPublishDate(bookDTO.getPublishDate());
+
+        return book;
+    }
+
+    // 更新書籍的資料轉換
+    private void editBook(Book existingBook, BookDTO bookDTO){
+        existingBook.setTitle(bookDTO.getTitle());
+        existingBook.setAuthor(bookDTO.getAuthor());
+        existingBook.setIsbn(bookDTO.getIsbn());
+        existingBook.setPublishDate(bookDTO.getPublishDate());
+        existingBook.setCollection(bookDTO.getCollection());
     }
 }

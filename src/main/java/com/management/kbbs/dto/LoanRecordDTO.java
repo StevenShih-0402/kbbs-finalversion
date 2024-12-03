@@ -1,7 +1,7 @@
 package com.management.kbbs.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -18,6 +18,4 @@ public class LoanRecordDTO {
     private LocalDate dueDate;     // 應還日期
     private LocalDate returnDate;  // 實際歸還日期
     private String status;    // 借閱狀態
-
-    // 其他轉換方法根據需求添加，例如 fromEntity 和 toEntity
 }

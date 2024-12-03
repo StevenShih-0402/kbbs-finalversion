@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LoanRecordRepository extends JpaRepository<LoanRecord, Long> {
-    // 你可以在這裡添加自定義查詢方法，例如：
-    // List<LoanRecord> findByUserId(Long userId);
-    // List<LoanRecord> findByBookId(Long bookId);
+
 }
 

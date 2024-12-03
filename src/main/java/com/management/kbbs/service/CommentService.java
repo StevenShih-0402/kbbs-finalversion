@@ -3,8 +3,10 @@ package com.management.kbbs.service;
 import com.management.kbbs.dto.CommentDTO;
 import com.management.kbbs.entity.Comment;
 import com.management.kbbs.repository.CommentRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,63 +18,31 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    // Create a new comment
+    // 新增一條評論
     public CommentDTO createComment(CommentDTO commentDTO) {
-        Comment comment = new Comment();
-        comment.setUserId(commentDTO.getUserId());
-        comment.setBookId(commentDTO.getBookId());
-        comment.setContent(commentDTO.getContent());
-        comment.setRating(commentDTO.getRating());
-        comment.setCreatedAt(LocalDateTime.now());
-
-        Comment savedComment = commentRepository.save(comment);
-
-        return CommentDTO.builder()
-                .id(comment.getId())
-                .userId(comment.getUserId())
-                .bookId(comment.getBookId())
-                .content(comment.getContent())
-                .rating(comment.getRating())
-                .createdAt(comment.getCreatedAt())
-                .build();
+        Comment savedComment = commentRepository.save(setNewComment(commentDTO));
+        return convertToDTO(savedComment);
     }
 
-    // Get a comment by ID
+    // 查詢特定的評論
     public CommentDTO getCommentById(Long id) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with ID: " + id));
-
-        return CommentDTO.builder()
-                .id(comment.getId())
-                .userId(comment.getUserId())
-                .bookId(comment.getBookId())
-                .content(comment.getContent())
-                .rating(comment.getRating())
-                .createdAt(comment.getCreatedAt())
-                .build();
+                                           .orElseThrow(() -> new RuntimeException("Comment not found with ID: " + id));
+        return convertToDTO(comment);
     }
 
-    // Update a comment
+    // 更新評論
     public CommentDTO updateComment(Long id, CommentDTO commentDTO) {
         Comment existingComment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with ID: " + id));
+                                                   .orElseThrow(() -> new RuntimeException("Comment not found with ID: " + id));
 
-        existingComment.setContent(commentDTO.getContent());
-        existingComment.setRating(commentDTO.getRating());
+        editComment(existingComment, commentDTO);
 
         Comment updatedComment = commentRepository.save(existingComment);
-
-        return CommentDTO.builder()
-                .id(updatedComment.getId())
-                .userId(updatedComment.getUserId())
-                .bookId(updatedComment.getBookId())
-                .content(updatedComment.getContent())
-                .rating(updatedComment.getRating())
-                .createdAt(updatedComment.getCreatedAt())
-                .build();
+        return convertToDTO(updatedComment);
     }
 
-    // Delete a comment
+    // 刪除一條評論
     public void deleteComment(Long id) {
         if (!commentRepository.existsById(id)) {
             throw new RuntimeException("Comment not found with ID: " + id);
@@ -80,52 +50,64 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    // Get all comments
+    // 查詢所有評論
     public List<CommentDTO> getAllComments() {
         return commentRepository.findAll()
                 .stream()
-                .map(comment -> CommentDTO.builder()
-                        .id(comment.getId())
-                        .userId(comment.getUserId())
-                        .bookId(comment.getBookId())
-                        .content(comment.getContent())
-                        .rating(comment.getRating())
-                        .createdAt(comment.getCreatedAt())
-                        .build()
-                )
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    // Get comments by book ID
+    // 查詢特定書籍獲得的評論
     public List<CommentDTO> getCommentsByBookId(Long bookId) {
         List<Comment> comments = commentRepository.findByBookId(bookId);
         return comments.stream()
-                .map(comment -> CommentDTO.builder()
-                        .id(comment.getId())
-                        .userId(comment.getUserId())
-                        .bookId(comment.getBookId())
-                        .content(comment.getContent())
-                        .rating(comment.getRating())
-                        .createdAt(comment.getCreatedAt())
-                        .build()
-                )
+                        .map(this::convertToDTO)
+                        .collect(Collectors.toList());
+    }
+
+
+    // 查詢特定用戶留下的評論
+    public List<CommentDTO> getCommentsByUserId(Long userId) {
+        List<Comment> comments = commentRepository.findByUserId(userId);
+        return comments.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
 
-    // Get comments by user ID
-    public List<CommentDTO> getCommentsByUserId(Long userId) {
-        List<Comment> comments = commentRepository.findByUserId(userId);
-        return comments.stream()
-                .map(comment -> CommentDTO.builder()
-                        .id(comment.getId())
-                        .userId(comment.getUserId())
-                        .bookId(comment.getBookId())
-                        .content(comment.getContent())
-                        .rating(comment.getRating())
-                        .createdAt(comment.getCreatedAt())
-                        .build()
-                )
-                .collect(Collectors.toList());
+
+
+
+    // 將 Comment 轉換成 CommentDTO
+    private CommentDTO convertToDTO(Comment comment) {
+        CommentDTO commentDTO = new CommentDTO();
+
+        commentDTO.setId(comment.getId());
+        commentDTO.setUserId(comment.getUserId());
+        commentDTO.setBookId(comment.getBookId());
+        commentDTO.setContent(comment.getContent());
+        commentDTO.setRating(comment.getRating());
+        commentDTO.setCreatedAt(comment.getCreatedAt());
+
+        return commentDTO;
+    }
+
+    // 新增評論的資料轉換
+    private Comment setNewComment(CommentDTO commentDTO){
+        Comment comment = new Comment();
+        comment.setUserId(commentDTO.getUserId());
+        comment.setBookId(commentDTO.getBookId());
+        comment.setContent(commentDTO.getContent());
+        comment.setRating(commentDTO.getRating());
+        comment.setCreatedAt(LocalDateTime.now());
+
+        return comment;
+    }
+
+    // 更新評論的資料轉換
+    private void editComment(Comment existingComment, CommentDTO commentDTO){
+        existingComment.setContent(commentDTO.getContent());
+        existingComment.setRating(commentDTO.getRating());
     }
 }

@@ -2,9 +2,11 @@ package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.CommentDTO;
 import com.management.kbbs.service.CommentService;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -15,49 +17,49 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // Create a new comment
+    // 新增評論
     @PostMapping
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO) {
         CommentDTO createdComment = commentService.createComment(commentDTO);
         return ResponseEntity.ok(createdComment);
     }
 
-    // Get a comment by ID
+    // 透過 ID 查詢評論
     @GetMapping("/{id}")
     public ResponseEntity<CommentDTO> getCommentById(@PathVariable Long id) {
         CommentDTO comment = commentService.getCommentById(id);
         return ResponseEntity.ok(comment);
     }
 
-    // Update a comment
+    // 更新評論
     @PutMapping("/{id}")
     public ResponseEntity<CommentDTO> updateComment(@PathVariable Long id, @RequestBody CommentDTO commentDTO) {
         CommentDTO updatedComment = commentService.updateComment(id, commentDTO);
         return ResponseEntity.ok(updatedComment);
     }
 
-    // Delete a comment
+    // 刪除評論
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Get all comments
+    // 查詢所有評論
     @GetMapping
     public ResponseEntity<List<CommentDTO>> getAllComments() {
         List<CommentDTO> comments = commentService.getAllComments();
         return ResponseEntity.ok(comments);
     }
 
-    // Get comments by book ID
+    // 查詢特定書籍獲得的評論
     @GetMapping("/books/{bookId}")
     public ResponseEntity<List<CommentDTO>> getCommentsByBookId(@PathVariable Long bookId) {
         List<CommentDTO> comments = commentService.getCommentsByBookId(bookId);
         return ResponseEntity.ok(comments);
     }
 
-    // Get comments by user ID
+    // 查詢特定使用者留下的評論
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<CommentDTO>> getCommentsByUserId(@PathVariable Long userId) {
         List<CommentDTO> comments = commentService.getCommentsByUserId(userId);
