@@ -25,10 +25,10 @@ public class LoanRecordService {
 
     // 新增借閱紀錄(借書)
     public LoanRecordDTO borrowBook(LoanRecordDTO loanRecordDTO) {
-        User user = userRepository.findById(loanRecordDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + loanRecordDTO.getUserId()));
-        Book book = bookRepository.findById(loanRecordDTO.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBookId()));
+        User user = userRepository.findById(loanRecordDTO.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + loanRecordDTO.getUser().getId()));
+        Book book = bookRepository.findById(loanRecordDTO.getBook().getId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBook().getId()));
 
         if ("館外".equals(book.getCollection())) {
             throw new RuntimeException("The book is already borrowed.");
@@ -44,8 +44,8 @@ public class LoanRecordService {
     public LoanRecordDTO returnBook(LoanRecordDTO loanRecordDTO) {
         LoanRecord loanRecord = loanRecordRepository.findById(loanRecordDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + loanRecordDTO.getId()));
-        Book book = bookRepository.findById(loanRecordDTO.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBookId()));
+        Book book = bookRepository.findById(loanRecordDTO.getBook().getId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + loanRecordDTO.getBook().getId()));
 
         updateReturnLoadRecord(loanRecord);
         bookIO(book, "館內");
@@ -98,8 +98,8 @@ public class LoanRecordService {
         LoanRecordDTO loanRecordDTO = new LoanRecordDTO();
 
         loanRecordDTO.setId(loanrecord.getId());
-        loanRecordDTO.setUserId(loanrecord.getUserId());
-        loanRecordDTO.setBookId(loanrecord.getBookId());
+        loanRecordDTO.setUser(loanrecord.getUser());
+        loanRecordDTO.setBook(loanrecord.getBook());
         loanRecordDTO.setLoanDate(loanrecord.getLoanDate());
         loanRecordDTO.setDueDate(loanrecord.getDueDate());
         loanRecordDTO.setReturnDate(loanrecord.getReturnDate());
@@ -111,8 +111,8 @@ public class LoanRecordService {
     // 借書的資料轉換
     private LoanRecord setNewLoadRecord(LoanRecordDTO loanRecordDTO){
         LoanRecord loanRecord = new LoanRecord();
-        loanRecord.setUserId(loanRecordDTO.getUserId());
-        loanRecord.setBookId(loanRecordDTO.getBookId());
+        loanRecord.setUser(loanRecordDTO.getUser());
+        loanRecord.setBook(loanRecordDTO.getBook());
         loanRecord.setLoanDate(LocalDate.now());
         loanRecord.setDueDate(LocalDate.now().plusWeeks(3));
         loanRecord.setStatus("借閱中");
@@ -132,8 +132,8 @@ public class LoanRecordService {
 
     // 更新借閱紀錄的資料轉換
     private void editLoadRecord(LoanRecord existLoanRecord, LoanRecordDTO loanRecordDTO){
-        existLoanRecord.setUserId(loanRecordDTO.getUserId());
-        existLoanRecord.setBookId(loanRecordDTO.getBookId());
+        existLoanRecord.setUser(loanRecordDTO.getUser());
+        existLoanRecord.setBook(loanRecordDTO.getBook());
         existLoanRecord.setLoanDate(loanRecordDTO.getLoanDate());
         existLoanRecord.setDueDate(loanRecordDTO.getDueDate());
         existLoanRecord.setReturnDate(loanRecordDTO.getReturnDate());

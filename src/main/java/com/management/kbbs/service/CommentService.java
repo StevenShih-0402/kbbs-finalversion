@@ -84,8 +84,8 @@ public class CommentService {
         CommentDTO commentDTO = new CommentDTO();
 
         commentDTO.setId(comment.getId());
-        commentDTO.setUserId(comment.getUserId());
-        commentDTO.setBookId(comment.getBookId());
+        commentDTO.setUser(comment.getUser());
+        commentDTO.setBook(comment.getBook());
         commentDTO.setContent(comment.getContent());
         commentDTO.setRating(comment.getRating());
         commentDTO.setCreatedAt(comment.getCreatedAt());
@@ -96,8 +96,8 @@ public class CommentService {
     // 新增評論的資料轉換
     private Comment setNewComment(CommentDTO commentDTO){
         Comment comment = new Comment();
-        comment.setUserId(commentDTO.getUserId());
-        comment.setBookId(commentDTO.getBookId());
+        comment.setUser(commentDTO.getUser());
+        comment.setBook(commentDTO.getBook());
         comment.setContent(commentDTO.getContent());
         comment.setRating(commentDTO.getRating());
         comment.setCreatedAt(LocalDateTime.now());

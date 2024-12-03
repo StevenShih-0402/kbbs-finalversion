@@ -1,5 +1,6 @@
 package com.management.kbbs.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,15 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 唯一識別每條評論
 
-    @Column(nullable = false)
-    private Long userId; // 使用者 ID
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 
-    @Column(nullable = false)
-    private Long bookId; // 書籍 ID
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    @JsonBackReference
+    private Book book;
 
     @Lob
     private String content; // 評論內容

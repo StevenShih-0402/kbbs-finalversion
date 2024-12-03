@@ -1,5 +1,6 @@
 package com.management.kbbs.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,15 @@ public class LoanRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId; // 對應 Users 表的 id
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 
-    @Column(name = "book_id", nullable = false)
-    private Long bookId; // 對應 Books 表的 id
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    @JsonBackReference
+    private Book book;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "loan_date", nullable = false, updatable = false)

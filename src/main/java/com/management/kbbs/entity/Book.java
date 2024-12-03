@@ -1,5 +1,6 @@
 package com.management.kbbs.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,4 +36,12 @@ public class Book {
 
     @Column(nullable = false)
     private String collection = "館內"; // 館藏狀態，預設值為 "館內"
+
+    @OneToMany(mappedBy = "book")
+    @JsonManagedReference
+    private List<LoanRecord> loanRecords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book")
+    @JsonManagedReference
+    private List<Comment> comments = new ArrayList<>();
 }
