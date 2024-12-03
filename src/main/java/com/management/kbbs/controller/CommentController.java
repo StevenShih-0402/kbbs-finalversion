@@ -1,9 +1,6 @@
 package com.management.kbbs.controller;
 
-import com.management.kbbs.dto.CommentDTO;
-import com.management.kbbs.dto.CommentRequestDTO;
-import com.management.kbbs.dto.CommentSearchDTO;
-import com.management.kbbs.dto.CommentUpdateDTO;
+import com.management.kbbs.dto.*;
 import com.management.kbbs.service.CommentService;
 
 import org.springframework.http.HttpStatus;
@@ -68,5 +65,12 @@ public class CommentController {
     public ResponseEntity<List<CommentSearchDTO>> getCommentsByUserId(@PathVariable Long userId) {
         List<CommentSearchDTO> comments = commentService.getCommentsByUserId(userId);
         return ResponseEntity.ok(comments);
+    }
+
+    // 查詢所有書籍的平均評分與評論數
+    @GetMapping("/ratings")
+    public ResponseEntity<List<BookEvaluateDTO>> getBookRatings() {
+        List<BookEvaluateDTO> ratings = commentService.getBookRatings();
+        return ResponseEntity.ok(ratings);
     }
 }

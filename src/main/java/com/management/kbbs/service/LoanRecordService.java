@@ -1,15 +1,12 @@
 package com.management.kbbs.service;
 
-import com.management.kbbs.dto.LoanRecordDTO;
-import com.management.kbbs.dto.LoanRecordRequestDTO;
-import com.management.kbbs.dto.LoanRecordUpdateDTO;
+import com.management.kbbs.dto.*;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.LoanRecord;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
-import com.management.kbbs.dto.PopularBookDTO;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -92,9 +89,15 @@ public class LoanRecordService {
     }
 
     // 熱門書籍排行(列出借閱次數最多的書籍)
-    public List<PopularBookDTO> getPopularBooks(int topN) {
+    public List<BookPopularDTO> getPopularBooks(int topN) {
         Pageable pageable = PageRequest.of(0, topN);
         return loanRecordRepository.findPopularBooks(pageable);
+    }
+
+    // 活躍用戶排行(列出借閱次數最多的用戶)
+    public List<UserActivityDTO> getActiveUsers(int topN) {
+        Pageable pageable = PageRequest.of(0, topN);
+        return loanRecordRepository.findActiveUsers(pageable);
     }
 
 

@@ -1,9 +1,6 @@
 package com.management.kbbs.service;
 
-import com.management.kbbs.dto.CommentDTO;
-import com.management.kbbs.dto.CommentRequestDTO;
-import com.management.kbbs.dto.CommentSearchDTO;
-import com.management.kbbs.dto.CommentUpdateDTO;
+import com.management.kbbs.dto.*;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.Comment;
 import com.management.kbbs.entity.User;
@@ -89,6 +86,10 @@ public class CommentService {
                        .collect(Collectors.toList());
     }
 
+    // 查詢書籍的平均評分與評論數
+    public List<BookEvaluateDTO> getBookRatings() {
+        return commentRepository.findAverageRatingAndCountByBook();
+    }
 
 
 

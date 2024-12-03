@@ -1,9 +1,6 @@
 package com.management.kbbs.controller;
 
-import com.management.kbbs.dto.LoanRecordDTO;
-import com.management.kbbs.dto.LoanRecordRequestDTO;
-import com.management.kbbs.dto.LoanRecordUpdateDTO;
-import com.management.kbbs.dto.PopularBookDTO;
+import com.management.kbbs.dto.*;
 import com.management.kbbs.service.LoanRecordService;
 
 import org.springframework.http.HttpStatus;
@@ -65,8 +62,15 @@ public class LoanRecordController {
 
     // 熱門書籍排行(列出借閱次數最多的書籍)
     @GetMapping("/popularBooks")
-    public ResponseEntity<List<PopularBookDTO>> getPopularBooks(@RequestParam(defaultValue = "10") int topN) {
-        List<PopularBookDTO> popularBooks = loanRecordService.getPopularBooks(topN);
+    public ResponseEntity<List<BookPopularDTO>> getPopularBooks(@RequestParam(defaultValue = "10") int topN) {
+        List<BookPopularDTO> popularBooks = loanRecordService.getPopularBooks(topN);
         return ResponseEntity.ok(popularBooks);
+    }
+
+    // 查詢圖書館活躍用戶排行
+    @GetMapping("/activeUsers")
+    public ResponseEntity<List<UserActivityDTO>> getActiveUsers(@RequestParam(defaultValue = "10") int topN) {
+        List<UserActivityDTO> activeUsers = loanRecordService.getActiveUsers(topN);
+        return ResponseEntity.ok(activeUsers);
     }
 }
