@@ -3,6 +3,7 @@ package com.management.kbbs.controller;
 import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.service.BookService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class BookController {
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
         BookDTO createdBook = bookService.createBook(bookDTO);
-        return ResponseEntity.ok(createdBook);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
     // 查詢所有書籍

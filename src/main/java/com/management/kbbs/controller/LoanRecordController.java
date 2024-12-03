@@ -1,8 +1,12 @@
 package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.LoanRecordDTO;
+import com.management.kbbs.dto.LoanRecordRequestDTO;
+import com.management.kbbs.dto.LoanRecordUpdateDTO;
+import com.management.kbbs.dto.PopularBookDTO;
 import com.management.kbbs.service.LoanRecordService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +23,15 @@ public class LoanRecordController {
 
     // 借書
     @PostMapping("/borrow")
-    public ResponseEntity<LoanRecordDTO> borrowBook(@RequestBody LoanRecordDTO loanRecordDTO) {
-        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(loanRecordDTO);
-        return ResponseEntity.ok(createLoanRecord);
+    public ResponseEntity<LoanRecordDTO> borrowBook(@RequestBody LoanRecordRequestDTO requestDTO) {
+        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createLoanRecord);
     }
 
     // 還書
     @PatchMapping("/return/{loanRecordId}")
-    public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable LoanRecordDTO loanRecordDTO) {
-        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanRecordDTO);
+    public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable Long loanRecordId) {
+        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanRecordId);
         return ResponseEntity.ok(updateLoanRecord);
     }
 
@@ -46,9 +50,9 @@ public class LoanRecordController {
     }
 
     // 更新借閱紀錄
-    @PutMapping("/{id}")
-    public ResponseEntity<LoanRecordDTO> updateLoanRecord(@PathVariable Long id, @RequestBody LoanRecordDTO loanRecordDTO) {
-        LoanRecordDTO updatedLoanRecord = loanRecordService.updateLoanRecord(id, loanRecordDTO);
+    @PatchMapping("/{id}")
+    public ResponseEntity<LoanRecordDTO> updateLoanRecord(@PathVariable Long id, @RequestBody LoanRecordUpdateDTO updateDTO) {
+        LoanRecordDTO updatedLoanRecord = loanRecordService.updateLoanRecord(id, updateDTO);
         return ResponseEntity.ok(updatedLoanRecord);
     }
 
@@ -57,5 +61,12 @@ public class LoanRecordController {
     public ResponseEntity<Void> deleteLoanRecord(@PathVariable Long id) {
         loanRecordService.deleteLoanRecord(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // 熱門書籍排行(列出借閱次數最多的書籍)
+    @GetMapping("/popularBooks")
+    public ResponseEntity<List<PopularBookDTO>> getPopularBooks(@RequestParam(defaultValue = "10") int topN) {
+        List<PopularBookDTO> popularBooks = loanRecordService.getPopularBooks(topN);
+        return ResponseEntity.ok(popularBooks);
     }
 }

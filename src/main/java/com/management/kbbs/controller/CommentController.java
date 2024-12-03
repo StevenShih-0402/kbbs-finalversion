@@ -1,8 +1,11 @@
 package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.CommentDTO;
+import com.management.kbbs.dto.CommentRequestDTO;
+import com.management.kbbs.dto.CommentUpdateDTO;
 import com.management.kbbs.service.CommentService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +22,9 @@ public class CommentController {
 
     // 新增評論
     @PostMapping
-    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO) {
-        CommentDTO createdComment = commentService.createComment(commentDTO);
-        return ResponseEntity.ok(createdComment);
+    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentRequestDTO requestDTO) {
+        CommentDTO createdComment = commentService.createComment(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
     // 透過 ID 查詢評論
@@ -32,9 +35,9 @@ public class CommentController {
     }
 
     // 更新評論
-    @PutMapping("/{id}")
-    public ResponseEntity<CommentDTO> updateComment(@PathVariable Long id, @RequestBody CommentDTO commentDTO) {
-        CommentDTO updatedComment = commentService.updateComment(id, commentDTO);
+    @PatchMapping("/{id}")
+    public ResponseEntity<CommentDTO> updateComment(@PathVariable Long id, @RequestBody CommentUpdateDTO updateDTO) {
+        CommentDTO updatedComment = commentService.updateComment(id, updateDTO);
         return ResponseEntity.ok(updatedComment);
     }
 

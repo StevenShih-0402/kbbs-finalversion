@@ -28,22 +28,22 @@ public class BookService {
     // 查詢所有書籍
     public List<BookDTO> getAllBooks() {
         return bookRepository.findAll()
-                            .stream()
-                            .map(this::convertToDTO)
-                            .collect(Collectors.toList());
+                             .stream()
+                             .map(this::convertToDTO)
+                             .collect(Collectors.toList());
     }
 
     // 根據 ID 查詢書籍
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
-                                .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
+                                  .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
         return convertToDTO(book);
     }
 
     // 更新書籍
     public BookDTO updateBook(Long id, BookDTO bookDTO) {
         Book existingBook = bookRepository.findById(id)
-                                        .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
+                                          .orElseThrow(() -> new IllegalArgumentException("未找到指定 ID 的書籍。"));
 
         editBook(existingBook, bookDTO);
 
@@ -62,9 +62,9 @@ public class BookService {
     // 根據關鍵字查詢書籍 (書名包含特定字串)
     public List<BookDTO> searchBooksByTitle(String keyword) {
         return bookRepository.findByTitleContaining(keyword)
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                             .stream()
+                             .map(this::convertToDTO)
+                             .collect(Collectors.toList());
     }
 
 

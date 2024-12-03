@@ -26,14 +26,14 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
     }
 
     // 根據ID查詢單一用戶
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));  // 或者可以自訂異常處理
+                                  .orElseThrow(() -> new RuntimeException("User not found with id: " + id));  // 或者可以自訂異常處理
         return convertToDTO(user);
 //        if (userOptional.isPresent()) {
 //            return convertToDTO(userOptional.get());
@@ -45,7 +45,7 @@ public class UserService {
     // 更新用戶
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User existUser = userRepository.findById(id)
-                                    .orElseThrow(() -> new RuntimeException("User not found with id: " + id));  // 或者可以自訂異常處理
+                                       .orElseThrow(() -> new RuntimeException("User not found with id: " + id));  // 或者可以自訂異常處理
 
         editUser(existUser, userDTO);
 
