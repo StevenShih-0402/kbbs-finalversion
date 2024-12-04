@@ -1,6 +1,7 @@
 package com.management.kbbs.repository;
 
 import com.management.kbbs.dto.BookPopularDTO;
+import com.management.kbbs.dto.BookUnreturnDTO;
 import com.management.kbbs.dto.UserActivityDTO;
 import com.management.kbbs.entity.LoanRecord;
 
@@ -13,6 +14,12 @@ import java.util.List;
 
 @Repository
 public interface LoanRecordRepository extends JpaRepository<LoanRecord, Long> {
+    // 查詢使用者目前的借閱數量
+    @Query("SELECT COUNT(lr) " +
+            "FROM LoanRecord lr " +
+            "WHERE lr.user.id = :userId AND lr.status = '借閱中'")
+    int countActiveLoansByUserId(Long userId);
+
     // 熱門書籍排行(列出借閱次數最多的書籍)
     @Query("SELECT new com.management.kbbs.dto.BookPopularDTO(b.id, b.title, b.author, COUNT(lr.id) as borrowCount) " +
             "FROM LoanRecord lr " +
@@ -28,5 +35,12 @@ public interface LoanRecordRepository extends JpaRepository<LoanRecord, Long> {
             "GROUP BY u.id, u.name " +
             "ORDER BY COUNT(lr) DESC")
     List<UserActivityDTO> findActiveUsers(Pageable pageable);
+
+    // 列出未歸還的書籍清單
+    @Query("SELECT new com.management.kbbs.dto.BookUnreturnDTO(" +
+            "lr.id, lr.book.id, lr.book.title, lr.book.author, lr.user.name, lr.loanDate, lr.dueDate) " +
+            "FROM LoanRecord lr " +
+            "WHERE lr.status = '借閱中'")
+    List<BookUnreturnDTO> findUnreturnedBooks();
 }
 

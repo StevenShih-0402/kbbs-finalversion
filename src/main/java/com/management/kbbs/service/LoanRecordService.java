@@ -4,6 +4,7 @@ import com.management.kbbs.dto.*;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.LoanRecord;
 import com.management.kbbs.entity.User;
+import com.management.kbbs.exception.BorrowLimitException;
 import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
@@ -25,6 +26,8 @@ public class LoanRecordService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
+    private final int MAX_LOANS_PER_USER = 6;
+
     // 新增借閱紀錄(借書)
     public LoanRecordDTO borrowBook(LoanRecordRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
@@ -32,8 +35,15 @@ public class LoanRecordService {
         Book book = bookRepository.findById(requestDTO.getBookId())
                                   .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
 
+        // 檢查書籍館藏狀態
         if ("館外".equals(book.getCollection())) {
             throw new RuntimeException("The book is already borrowed.");
+        }
+
+        // 檢查當前借閱數量
+        int activeLoans = loanRecordRepository.countActiveLoansByUserId(user.getId());
+        if (activeLoans >= MAX_LOANS_PER_USER) {
+            throw new BorrowLimitException("User has reached the maximum loan limit of " + MAX_LOANS_PER_USER);
         }
 
         bookIO(book, "館外");
@@ -99,6 +109,13 @@ public class LoanRecordService {
         Pageable pageable = PageRequest.of(0, topN);
         return loanRecordRepository.findActiveUsers(pageable);
     }
+
+    // 列出未歸還的書籍清單
+    public List<BookUnreturnDTO> getUnreturnedBooks() {
+        return loanRecordRepository.findUnreturnedBooks();
+    }
+
+
 
 
 

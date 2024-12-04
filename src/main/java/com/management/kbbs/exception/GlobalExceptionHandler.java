@@ -1,5 +1,6 @@
 package com.management.kbbs.exception;
 
+import com.management.kbbs.exception.BorrowLimitException;
 import org.springframework.ui.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + ex.getMessage());
+    }
+
+    // 借閱數量超過上限的錯誤回報
+    @ExceptionHandler(BorrowLimitException.class)
+    public ResponseEntity<String> handleLoanLimitExceededException(BorrowLimitException ex) {
+        // 回傳 HTTP 400 Bad Request 和具體錯誤訊息
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

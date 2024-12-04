@@ -73,4 +73,11 @@ public class LoanRecordController {
         List<UserActivityDTO> activeUsers = loanRecordService.getActiveUsers(topN);
         return ResponseEntity.ok(activeUsers);
     }
+
+    // 列出未歸還的書籍清單
+    @GetMapping("/unreturnedBooks")
+    public ResponseEntity<List<BookUnreturnDTO>> getUnreturnedBooks() {
+        List<BookUnreturnDTO> unreturnedBooks = loanRecordService.getUnreturnedBooks();
+        return ResponseEntity.ok(unreturnedBooks);
+    }
 }
