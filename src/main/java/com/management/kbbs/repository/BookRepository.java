@@ -4,7 +4,7 @@ import com.management.kbbs.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
@@ -13,6 +13,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByIsbn(String isbn);
 
     // 根據書名進行模糊查詢
-    Optional<Book> findByTitleContaining(String title);
+    List<Book> findByTitleContaining(String title);
 
 }

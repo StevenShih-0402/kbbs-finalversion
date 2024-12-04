@@ -1,6 +1,5 @@
 package com.management.kbbs.dto;
 
-import com.management.kbbs.entity.Book;
 import lombok.Data;
 
 import java.time.LocalDate;

@@ -35,11 +35,6 @@ public class UserService {
         User user = userRepository.findById(id)
                                   .orElseThrow(() -> new RuntimeException("User not found with id: " + id));  // 或者可以自訂異常處理
         return convertToDTO(user);
-//        if (userOptional.isPresent()) {
-//            return convertToDTO(userOptional.get());
-//        } else {
-//            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
-//        }
     }
 
     // 更新用戶
@@ -51,18 +46,6 @@ public class UserService {
 
         User updatedUser = userRepository.save(existUser);
         return convertToDTO(updatedUser);
-
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            user.setName(userDTO.getName());
-//            user.setEmail(userDTO.getEmail());
-//            user.setPhone(userDTO.getPhone());
-//
-//            User updatedUser = userRepository.save(user);
-//            return convertToDTO(updatedUser);
-//        } else {
-//            throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
-//        }
     }
 
     // 刪除用戶

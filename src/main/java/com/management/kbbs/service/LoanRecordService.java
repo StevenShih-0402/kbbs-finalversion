@@ -4,7 +4,7 @@ import com.management.kbbs.dto.*;
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.entity.LoanRecord;
 import com.management.kbbs.entity.User;
-import com.management.kbbs.exception.BorrowLimitException;
+import com.management.kbbs.exception.GlobalExceptionHandler;
 import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
@@ -43,7 +43,7 @@ public class LoanRecordService {
         // 檢查當前借閱數量
         int activeLoans = loanRecordRepository.countActiveLoansByUserId(user.getId());
         if (activeLoans >= MAX_LOANS_PER_USER) {
-            throw new BorrowLimitException("User has reached the maximum loan limit of " + MAX_LOANS_PER_USER);
+            throw new GlobalExceptionHandler.BorrowLimitException("User has reached the maximum loan limit of " + MAX_LOANS_PER_USER);
         }
 
         bookIO(book, "館外");
