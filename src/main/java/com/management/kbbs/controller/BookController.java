@@ -19,11 +19,13 @@ public class BookController {
     private final BookService bookService;
 
     // 新增書籍
-    @PostMapping
-    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
-        BookDTO createdBook = bookService.createBook(bookDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
-    }
+//    @PostMapping
+//    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+//        BookDTO createdBook = bookService.createBook(bookDTO);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+//    }
+
+
 
     // 查詢所有書籍
     @GetMapping

@@ -19,10 +19,29 @@ public class UserController {
     private final UserService userService;
 
     // 創建用戶
-    @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.createUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+//    @PostMapping
+//    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+//        UserDTO createdUser = userService.createUser(userDTO);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+//    }
+
+    // 註冊
+    @PostMapping("/register")
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.registerUser(userDTO));
+    }
+
+    // 登入
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestParam String username, @RequestParam String password) {
+        return ResponseEntity.ok(userService.loginUser(username, password));
+    }
+
+    // 登出
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logoutUser(@RequestParam String username) {
+        userService.logoutUser(username);
+        return ResponseEntity.noContent().build();
     }
 
     // 查詢所有用戶

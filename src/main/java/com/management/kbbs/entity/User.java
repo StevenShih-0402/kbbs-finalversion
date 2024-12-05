@@ -32,6 +32,8 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private String password;
+
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<LoanRecord> loanRecords = new ArrayList<>();

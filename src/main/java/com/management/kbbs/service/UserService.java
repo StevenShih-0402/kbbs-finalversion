@@ -4,10 +4,16 @@ import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.UserRepository;
 
+import com.management.kbbs.security.JwtTokenProvider;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,11 +21,53 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+//    private final PasswordEncoder passwordEncoder;
+//    private final JwtUtil jwtUtil;
+//    private final Map<String, String> tokenStore = new HashMap<>(); // 用來模擬登出的 token 清除
 
     // 創建用戶
-    public UserDTO createUser(UserDTO userDTO) {
+//    public UserDTO createUser(UserDTO userDTO) {
+//        User savedUser = userRepository.save(setNewUser(userDTO));
+//        return convertToDTO(savedUser);
+//    }
+
+    // 註冊新的用戶
+    @Transactional
+    public UserDTO registerUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        // 密碼加密
+        String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
+        userDTO.setPassword(encryptedPassword);
+
         User savedUser = userRepository.save(setNewUser(userDTO));
         return convertToDTO(savedUser);
+    }
+
+    // 用戶登入
+    @Transactional
+    public String loginUser(String username, String password) {
+        User user = userRepository.findByName(username)
+                                  .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        String token = jwtTokenProvider.createToken(user.getName());
+        // 將 token 儲存至 Redis，設定過期時間
+        redisTemplate.opsForValue().set(user.getName(), token, 1, TimeUnit.HOURS);
+        return token;
+    }
+
+    // 用戶登出
+    public void logoutUser(String username) {
+        redisTemplate.delete(username);
     }
 
     // 查詢所有用戶
@@ -68,16 +116,18 @@ public class UserService {
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhone(user.getPhone());
+        userDTO.setPassword(user.getPassword());
         userDTO.setCreateAt(user.getCreatedAt());
         return userDTO;
     }
 
-    // 創建用戶的資料轉換
+    // 創建(註冊)用戶的資料轉換
     private User setNewUser(UserDTO userDTO){
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPhone(userDTO.getPhone());
+        user.setPassword(userDTO.getPassword());
 
         return user;
     }
