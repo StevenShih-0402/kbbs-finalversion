@@ -34,7 +34,7 @@ public class SecurityConfig {
 
         return http.csrf(csrf -> csrf.disable()) // 禁用 CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/register", "/api/users/login", "/api/users").permitAll() // 公開端點
+                        .requestMatchers("/api/users/register", "/api/users/login", "/api/users", "/api/stats").permitAll() // 公開端點
                         .anyRequest().authenticated()) // 其他端點需身份驗證，否則回傳 403 Forbidden
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // 添加 JWT 過濾器
                 .build(); // 返回構建的 SecurityFilterChain
