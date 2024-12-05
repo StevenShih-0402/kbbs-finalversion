@@ -9,10 +9,12 @@ import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
 
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +31,7 @@ public class LoanRecordService {
     private final int MAX_LOANS_PER_USER = 6;
 
     // 新增借閱紀錄(借書)
+    @Transactional
     public LoanRecordDTO borrowBook(LoanRecordRequestDTO requestDTO) {
         User user = userRepository.findById(requestDTO.getUserId())
                                   .orElseThrow(() -> new RuntimeException("User not found with ID: " + requestDTO.getUserId()));
@@ -53,6 +56,7 @@ public class LoanRecordService {
     }
 
     // 更新借閱紀錄(還書)
+    @Transactional
     public LoanRecordDTO returnBook(Long id) {
         LoanRecord loanRecord = loanRecordRepository.findById(id)
                                                     .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
