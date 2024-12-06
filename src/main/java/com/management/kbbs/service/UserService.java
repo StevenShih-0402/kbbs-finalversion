@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -51,24 +53,43 @@ public class UserService {
 
     // 用戶登入
     @Transactional
-    public String loginUser(String username, String password) {
+    public Map<String, String> loginUser(String username, String password) {
+        // 確認用戶存在
         User user = userRepository.findByName(username)
-                                  .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // 驗證密碼
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
+        // 生成 Token
         String token = jwtTokenProvider.createToken(user.getName());
-        // 將 token 儲存至 Redis，設定過期時間
-        redisTemplate.opsForValue().set(user.getName(), token, 1, TimeUnit.HOURS);
-        return token;
+
+        // 將 Token 儲存至 Redis，Key 為 Token，Value 為用戶名，並設定過期時間
+        redisTemplate.opsForValue().set(token, user.getName(), 1, TimeUnit.HOURS);
+
+        // 返回 JSON 結構
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("token", token);
+
+        return response;
     }
 
     // 用戶登出
-    public void logoutUser(String username) {
-        redisTemplate.delete(username);
-    }
+//    public void logoutUser(String username, String token) {
+//        // 從 Redis 中取出與 username 對應的 Token
+//        String storedToken = redisTemplate.opsForValue().get(username);
+//
+//        // 驗證 Token 是否存在且匹配
+//        if (storedToken == null || !storedToken.equals(token)) {
+//            throw new RuntimeException("Token not found or already expired");
+//        }
+//
+//        // 刪除與 username 對應的 Token
+//        redisTemplate.delete(username);
+//    }
 
     // 查詢所有用戶
     public List<UserDTO> getAllUsers() {

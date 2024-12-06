@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -33,16 +34,23 @@ public class UserController {
 
     // 登入
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<Map<String, String>> loginUser(@RequestParam String username, @RequestParam String password) {
         return ResponseEntity.ok(userService.loginUser(username, password));
     }
 
     // 登出
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logoutUser(@RequestParam String username) {
-        userService.logoutUser(username);
-        return ResponseEntity.noContent().build();
-    }
+//    @PostMapping("/logout")
+//    public ResponseEntity<String> logoutUser(
+//            @RequestParam String username,
+//            @RequestHeader("Authorization") String authorizationHeader) {
+//
+//        // 從 Authorization Header 中提取 Token（格式為 "Bearer <token>"）
+//        String token = authorizationHeader.replace("Bearer ", "").trim();
+//
+//        // 調用 Service 執行登出邏輯
+//        userService.logoutUser(username, token);
+//        return ResponseEntity.ok("Successfully logged out");
+//    }
 
     // 查詢所有用戶
     @GetMapping
