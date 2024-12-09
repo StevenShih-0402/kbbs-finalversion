@@ -6,6 +6,7 @@ import com.management.kbbs.repository.LoanRecordRepository;
 import com.management.kbbs.repository.UserRepository;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ public class StatsController {
     private final CommentRepository commentRepository;
 
     // 回傳書籍、用戶、借閱紀錄和評論的總數
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Map<String, Long>> getAllCounts() {
         Map<String, Long> stats = new HashMap<>();

@@ -1,6 +1,7 @@
 package com.management.kbbs.service;
 
 import com.management.kbbs.dto.UserDTO;
+import com.management.kbbs.dto.UserLoginDTO;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.UserRepository;
 
@@ -53,13 +54,13 @@ public class UserService {
 
     // 用戶登入
     @Transactional
-    public Map<String, String> loginUser(String username, String password) {
+    public Map<String, String> loginUser(UserLoginDTO userLoginDTO) {
         // 確認用戶存在
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByName(userLoginDTO.getUsername())
+                                  .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 驗證密碼
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
@@ -138,6 +139,7 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setPhone(user.getPhone());
         userDTO.setPassword(user.getPassword());
+        userDTO.setPermission(user.getPermission());
         userDTO.setCreateAt(user.getCreatedAt());
         return userDTO;
     }

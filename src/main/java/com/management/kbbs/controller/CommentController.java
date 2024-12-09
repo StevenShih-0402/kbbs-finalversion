@@ -5,6 +5,7 @@ import com.management.kbbs.service.CommentService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,15 @@ public class CommentController {
     private final CommentService commentService;
 
     // 新增評論
-    @PostMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_MEMBER', 'ROLE_ADMIN')")
+    @PostMapping("/add")
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentRequestDTO requestDTO) {
         CommentDTO createdComment = commentService.createComment(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
     // 透過 ID 查詢評論
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<CommentDTO> getCommentById(@PathVariable Long id) {
         CommentDTO comment = commentService.getCommentById(id);
@@ -33,20 +36,23 @@ public class CommentController {
     }
 
     // 更新評論
-    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<CommentDTO> updateComment(@PathVariable Long id, @RequestBody CommentUpdateDTO updateDTO) {
         CommentDTO updatedComment = commentService.updateComment(id, updateDTO);
         return ResponseEntity.ok(updatedComment);
     }
 
     // 刪除評論
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
     }
 
     // 查詢所有評論
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<CommentDTO>> getAllComments() {
         List<CommentDTO> comments = commentService.getAllComments();
@@ -61,6 +67,7 @@ public class CommentController {
     }
 
     // 查詢特定使用者留下的評論
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<CommentSearchDTO>> getCommentsByUserId(@PathVariable Long userId) {
         List<CommentSearchDTO> comments = commentService.getCommentsByUserId(userId);

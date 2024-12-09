@@ -34,6 +34,8 @@ public class User {
 
     private String password;
 
+    private String permission = "MEMBER";
+
     @OneToMany(mappedBy = "user")
     @JsonManagedReference
     private List<LoanRecord> loanRecords = new ArrayList<>();

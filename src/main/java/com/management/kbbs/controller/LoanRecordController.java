@@ -5,6 +5,7 @@ import com.management.kbbs.service.LoanRecordService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class LoanRecordController {
     private final LoanRecordService loanRecordService;
 
     // 借書
+    @PreAuthorize("hasAnyAuthority('ROLE_MEMBER', 'ROLE_ADMIN')")
     @PostMapping("/borrow")
     public ResponseEntity<LoanRecordDTO> borrowBook(@RequestBody LoanRecordRequestDTO requestDTO) {
         LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(requestDTO);
@@ -26,6 +28,7 @@ public class LoanRecordController {
     }
 
     // 還書
+    @PreAuthorize("hasAnyAuthority('ROLE_MEMBER', 'ROLE_ADMIN')")
     @PatchMapping("/return/{loanRecordId}")
     public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable Long loanRecordId) {
         LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanRecordId);
@@ -33,6 +36,7 @@ public class LoanRecordController {
     }
 
     // 查詢所有借閱紀錄
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<LoanRecordDTO>> getAllLoanRecords() {
         List<LoanRecordDTO> loanRecords = loanRecordService.getAllLoanRecords();
@@ -40,6 +44,7 @@ public class LoanRecordController {
     }
 
     // 查詢單一借閱紀錄
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<LoanRecordDTO> getLoanRecordById(@PathVariable Long id) {
         LoanRecordDTO loanRecordDTO = loanRecordService.getLoanRecordById(id);
@@ -47,14 +52,16 @@ public class LoanRecordController {
     }
 
     // 更新借閱紀錄
-    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<LoanRecordDTO> updateLoanRecord(@PathVariable Long id, @RequestBody LoanRecordUpdateDTO updateDTO) {
         LoanRecordDTO updatedLoanRecord = loanRecordService.updateLoanRecord(id, updateDTO);
         return ResponseEntity.ok(updatedLoanRecord);
     }
 
     // 刪除借閱紀錄
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteLoanRecord(@PathVariable Long id) {
         loanRecordService.deleteLoanRecord(id);
         return ResponseEntity.noContent().build();
@@ -68,6 +75,7 @@ public class LoanRecordController {
     }
 
     // 查詢圖書館活躍用戶排行
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/activeUsers")
     public ResponseEntity<List<UserActivityDTO>> getActiveUsers(@RequestParam(defaultValue = "10") int topN) {
         List<UserActivityDTO> activeUsers = loanRecordService.getActiveUsers(topN);
@@ -75,6 +83,7 @@ public class LoanRecordController {
     }
 
     // 列出未歸還的書籍清單
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/unreturnedBooks")
     public ResponseEntity<List<BookUnreturnDTO>> getUnreturnedBooks() {
         List<BookUnreturnDTO> unreturnedBooks = loanRecordService.getUnreturnedBooks();

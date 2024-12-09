@@ -1,10 +1,12 @@
 package com.management.kbbs.controller;
 
 import com.management.kbbs.dto.UserDTO;
+import com.management.kbbs.dto.UserLoginDTO;
 import com.management.kbbs.service.UserService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,8 @@ public class UserController {
 
     // 登入
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginUser(@RequestParam String username, @RequestParam String password) {
-        return ResponseEntity.ok(userService.loginUser(username, password));
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
+        return ResponseEntity.ok(userService.loginUser(userLoginDTO));
     }
 
     // 登出
@@ -53,6 +55,7 @@ public class UserController {
 //    }
 
     // 查詢所有用戶
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
@@ -60,6 +63,7 @@ public class UserController {
     }
 
     // 根據ID查詢單一用戶
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         UserDTO user = userService.getUserById(id);
@@ -67,14 +71,16 @@ public class UserController {
     }
 
     // 更新用戶
-    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO updatedUser = userService.updateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
     }
 
     // 刪除用戶
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

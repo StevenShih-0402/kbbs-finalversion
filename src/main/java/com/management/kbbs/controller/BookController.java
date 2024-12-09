@@ -5,6 +5,7 @@ import com.management.kbbs.service.BookService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,12 @@ public class BookController {
     private final BookService bookService;
 
     // 新增書籍
-//    @PostMapping
-//    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
-//        BookDTO createdBook = bookService.createBook(bookDTO);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
-//    }
-
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/add")
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+        BookDTO createdBook = bookService.createBook(bookDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+    }
 
 
     // 查詢所有書籍
@@ -35,6 +36,7 @@ public class BookController {
     }
 
     // 根據 ID 查詢書籍
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
         BookDTO book = bookService.getBookById(id);
@@ -42,14 +44,16 @@ public class BookController {
     }
 
     // 更新書籍
-    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/update/{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
         BookDTO updatedBook = bookService.updateBook(id, bookDTO);
         return ResponseEntity.ok(updatedBook);
     }
 
     // 刪除書籍
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();

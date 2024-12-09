@@ -3,6 +3,7 @@ package com.management.kbbs.service;
 import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),
                 user.getPassword(),
-                new ArrayList<>()
+                AuthorityUtils.createAuthorityList("ROLE_" + user.getPermission())
         );
     }
 }
