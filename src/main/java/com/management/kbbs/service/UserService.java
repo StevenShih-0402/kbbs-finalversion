@@ -6,6 +6,7 @@ import com.management.kbbs.entity.User;
 import com.management.kbbs.repository.UserRepository;
 
 import com.management.kbbs.security.JwtTokenProvider;
+import com.management.kbbs.security.TokenStore;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final TokenStore tokenStore;
 
 //    private final PasswordEncoder passwordEncoder;
 //    private final JwtUtil jwtUtil;
@@ -65,10 +67,10 @@ public class UserService {
         }
 
         // 生成 Token
-        String token = jwtTokenProvider.createToken(user.getName());
+        String token = jwtTokenProvider.createToken(user.getName(), user.getPermission());
 
         // 將 Token 儲存至 Redis，Key 為 Token，Value 為用戶名，並設定過期時間
-        redisTemplate.opsForValue().set(token, user.getName(), 1, TimeUnit.HOURS);
+        tokenStore.storeToken(user.getName(),  token, 1L, TimeUnit.HOURS);
 
         // 返回 JSON 結構
         Map<String, String> response = new HashMap<>();
@@ -131,6 +133,7 @@ public class UserService {
 
 
 
+
     // 將 User 轉換為 UserDTO
     private UserDTO convertToDTO(User user) {
         UserDTO userDTO = new UserDTO();
@@ -160,5 +163,7 @@ public class UserService {
         existUser.setName(userDTO.getName());
         existUser.setEmail(userDTO.getEmail());
         existUser.setPhone(userDTO.getPhone());
+        existUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        existUser.setPermission(userDTO.getPermission());
     }
 }

@@ -20,71 +20,71 @@ public class LoanRecordController {
     private final LoanRecordService loanRecordService;
 
     // 借書
-    @PreAuthorize("hasAnyAuthority('ROLE_MEMBER', 'ROLE_ADMIN')")
-    @PostMapping("/borrow")
-    public ResponseEntity<LoanRecordDTO> borrowBook(@RequestBody LoanRecordRequestDTO requestDTO) {
-        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(requestDTO);
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PostMapping("/member/borrow/{bookId}")
+    public ResponseEntity<LoanRecordDTO> borrowBook(@PathVariable Long bookId) {
+        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(bookId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createLoanRecord);
     }
 
     // 還書
-    @PreAuthorize("hasAnyAuthority('ROLE_MEMBER', 'ROLE_ADMIN')")
-    @PatchMapping("/return/{loanRecordId}")
-    public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable Long loanRecordId) {
-        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanRecordId);
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PatchMapping("/member/return/{loanrecordId}")
+    public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable Long loanrecordId) {
+        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanrecordId);
         return ResponseEntity.ok(updateLoanRecord);
     }
 
     // 查詢所有借閱紀錄
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin")
     public ResponseEntity<List<LoanRecordDTO>> getAllLoanRecords() {
         List<LoanRecordDTO> loanRecords = loanRecordService.getAllLoanRecords();
         return ResponseEntity.ok(loanRecords);
     }
 
     // 查詢單一借閱紀錄
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/{id}")
     public ResponseEntity<LoanRecordDTO> getLoanRecordById(@PathVariable Long id) {
         LoanRecordDTO loanRecordDTO = loanRecordService.getLoanRecordById(id);
         return ResponseEntity.ok(loanRecordDTO);
     }
 
     // 更新借閱紀錄
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PatchMapping("/update/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/admin/update/{id}")
     public ResponseEntity<LoanRecordDTO> updateLoanRecord(@PathVariable Long id, @RequestBody LoanRecordUpdateDTO updateDTO) {
         LoanRecordDTO updatedLoanRecord = loanRecordService.updateLoanRecord(id, updateDTO);
         return ResponseEntity.ok(updatedLoanRecord);
     }
 
     // 刪除借閱紀錄
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Void> deleteLoanRecord(@PathVariable Long id) {
         loanRecordService.deleteLoanRecord(id);
         return ResponseEntity.noContent().build();
     }
 
     // 熱門書籍排行(列出借閱次數最多的書籍)
-    @GetMapping("/popularBooks")
+    @GetMapping("/public/popularBooks")
     public ResponseEntity<List<BookPopularDTO>> getPopularBooks(@RequestParam(defaultValue = "10") int topN) {
         List<BookPopularDTO> popularBooks = loanRecordService.getPopularBooks(topN);
         return ResponseEntity.ok(popularBooks);
     }
 
     // 查詢圖書館活躍用戶排行
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/activeUsers")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/activeUsers")
     public ResponseEntity<List<UserActivityDTO>> getActiveUsers(@RequestParam(defaultValue = "10") int topN) {
         List<UserActivityDTO> activeUsers = loanRecordService.getActiveUsers(topN);
         return ResponseEntity.ok(activeUsers);
     }
 
     // 列出未歸還的書籍清單
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/unreturnedBooks")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/unreturnedBooks")
     public ResponseEntity<List<BookUnreturnDTO>> getUnreturnedBooks() {
         List<BookUnreturnDTO> unreturnedBooks = loanRecordService.getUnreturnedBooks();
         return ResponseEntity.ok(unreturnedBooks);

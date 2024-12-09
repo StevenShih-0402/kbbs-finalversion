@@ -12,6 +12,7 @@ import com.management.kbbs.repository.UserRepository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,13 @@ public class LoanRecordService {
 
     // 新增借閱紀錄(借書)
     @Transactional
-    public LoanRecordDTO borrowBook(LoanRecordRequestDTO requestDTO) {
-        User user = userRepository.findById(requestDTO.getUserId())
-                                  .orElseThrow(() -> new RuntimeException("User not found with ID: " + requestDTO.getUserId()));
-        Book book = bookRepository.findById(requestDTO.getBookId())
-                                  .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
+    public LoanRecordDTO borrowBook(Long bookId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByName(username)
+                                  .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
+        Book book = bookRepository.findById(bookId)
+                                  .orElseThrow(() -> new RuntimeException("Book not found with ID: " + bookId));
 
         // 檢查書籍館藏狀態
         if ("館外".equals(book.getCollection())) {

@@ -27,8 +27,8 @@ public class StatsController {
     private final CommentRepository commentRepository;
 
     // 回傳書籍、用戶、借閱紀錄和評論的總數
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin")
     public ResponseEntity<Map<String, Long>> getAllCounts() {
         Map<String, Long> stats = new HashMap<>();
 

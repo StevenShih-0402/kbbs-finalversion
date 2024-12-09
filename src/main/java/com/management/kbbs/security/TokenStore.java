@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 @RequiredArgsConstructor
 public class TokenStore {
@@ -11,8 +13,8 @@ public class TokenStore {
     private final RedisTemplate<String, String> redisTemplate;
 
     // 存儲 JWT token
-    public void storeToken(String username, String token) {
-        redisTemplate.opsForValue().set(username, token);
+    public void storeToken(String username, String token, Long expirationTime, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(username, token, expirationTime, timeUnit);
     }
 
     // 獲取 JWT token

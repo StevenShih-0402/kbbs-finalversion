@@ -8,6 +8,7 @@ import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.CommentRepository;
 
 import com.management.kbbs.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,10 @@ public class CommentService {
 
     // 新增一條評論
     public CommentDTO createComment(CommentRequestDTO requestDTO) {
-        User user = userRepository.findById(requestDTO.getUserId())
-                                  .orElseThrow(() -> new RuntimeException("User not found with ID: " + requestDTO.getUserId()));
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByName(username)
+                                  .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
         Book book = bookRepository.findById(requestDTO.getBookId())
                                   .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
 

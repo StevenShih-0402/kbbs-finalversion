@@ -4,7 +4,6 @@ import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.dto.UserLoginDTO;
 import com.management.kbbs.service.UserService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +28,13 @@ public class UserController {
 //    }
 
     // 註冊
-    @PostMapping("/register")
+    @PostMapping("/public/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.registerUser(userDTO));
     }
 
     // 登入
-    @PostMapping("/login")
+    @PostMapping("/public/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
         return ResponseEntity.ok(userService.loginUser(userLoginDTO));
     }
@@ -55,32 +54,32 @@ public class UserController {
 //    }
 
     // 查詢所有用戶
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     // 根據ID查詢單一用戶
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         UserDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     // 更新用戶
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/admin/update/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         UserDTO updatedUser = userService.updateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
     }
 
     // 刪除用戶
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
