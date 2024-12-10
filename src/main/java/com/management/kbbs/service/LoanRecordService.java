@@ -12,6 +12,7 @@ import com.management.kbbs.repository.UserRepository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,10 @@ public class LoanRecordService {
     private final LoanRecordRepository loanRecordRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     private final int MAX_LOANS_PER_USER = 6;
+    private final String BORROW_TOPIC = "borrow-topic";
 
     // 新增借閱紀錄(借書)
     @Transactional
@@ -54,6 +57,10 @@ public class LoanRecordService {
 
         bookIO(book, "館外");
 
+        // 發送消息到 Kafka
+        String message = "User " + username + " borrowed book " + bookId;
+        kafkaTemplate.send(BORROW_TOPIC, message);
+
         LoanRecord savedLoanRecord = loanRecordRepository.save(setNewLoadRecord(user, book));
         return convertToDTO(savedLoanRecord);
     }
@@ -66,6 +73,10 @@ public class LoanRecordService {
 
         updateReturnLoadRecord(loanRecord);
         bookIO(loanRecord.getBook(), "館內");
+
+        // 發送還書消息到 Kafka
+        String message = "User " + loanRecord.getUser().getName() + " returned book " + loanRecord.getBook().getId();
+        kafkaTemplate.send("return-topic", message);
 
         LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
         return convertToDTO(updatedLoanRecord);
@@ -122,6 +133,14 @@ public class LoanRecordService {
         return loanRecordRepository.findUnreturnedBooks();
     }
 
+    // 讓使用者查詢簡易的借閱紀錄
+    public List<UserSimpleLoanDTO> getSimplifiedLoanRecords() {
+        // 獲取當前登入使用者的名稱
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 調用 Repository 層來查詢該使用者的借閱紀錄
+        return loanRecordRepository.findSimplifiedLoanRecordsByUserName(username);
+    }
 
 
 

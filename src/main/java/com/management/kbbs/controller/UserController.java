@@ -40,18 +40,11 @@ public class UserController {
     }
 
     // 登出
-//    @PostMapping("/logout")
-//    public ResponseEntity<String> logoutUser(
-//            @RequestParam String username,
-//            @RequestHeader("Authorization") String authorizationHeader) {
-//
-//        // 從 Authorization Header 中提取 Token（格式為 "Bearer <token>"）
-//        String token = authorizationHeader.replace("Bearer ", "").trim();
-//
-//        // 調用 Service 執行登出邏輯
-//        userService.logoutUser(username, token);
-//        return ResponseEntity.ok("Successfully logged out");
-//    }
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(userService.logoutUser(token));
+    }
 
     // 查詢所有用戶
     @PreAuthorize("hasRole('ROLE_ADMIN')")

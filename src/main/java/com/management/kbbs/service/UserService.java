@@ -8,6 +8,7 @@ import com.management.kbbs.repository.UserRepository;
 import com.management.kbbs.security.JwtTokenProvider;
 import com.management.kbbs.security.TokenStore;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -81,18 +82,19 @@ public class UserService {
     }
 
     // 用戶登出
-//    public void logoutUser(String username, String token) {
-//        // 從 Redis 中取出與 username 對應的 Token
-//        String storedToken = redisTemplate.opsForValue().get(username);
-//
-//        // 驗證 Token 是否存在且匹配
-//        if (storedToken == null || !storedToken.equals(token)) {
-//            throw new RuntimeException("Token not found or already expired");
-//        }
-//
-//        // 刪除與 username 對應的 Token
-//        redisTemplate.delete(username);
-//    }
+    public String logoutUser(String token) {
+        // 假設 Token 格式是 "Bearer <actual_token>"
+        if (token.startsWith("Bearer ")) {
+            String actualToken = token.substring(7);
+
+            // 從 Redis 中刪除該 Token
+            redisTemplate.delete(actualToken);
+
+            return "Logout successful";
+        } else {
+            return "Invalid token format";
+        }
+    }
 
     // 查詢所有用戶
     public List<UserDTO> getAllUsers() {
@@ -127,6 +129,8 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
+    // 用戶修改密碼
 
 
 

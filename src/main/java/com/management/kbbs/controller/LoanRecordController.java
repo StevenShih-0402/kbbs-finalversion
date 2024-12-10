@@ -89,4 +89,12 @@ public class LoanRecordController {
         List<BookUnreturnDTO> unreturnedBooks = loanRecordService.getUnreturnedBooks();
         return ResponseEntity.ok(unreturnedBooks);
     }
+
+    // 讓使用者查詢簡易的借閱紀錄
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @GetMapping("/member/simplified")
+    public ResponseEntity<List<UserSimpleLoanDTO>> getSimplifiedLoanRecords() {
+        List<UserSimpleLoanDTO> records = loanRecordService.getSimplifiedLoanRecords();
+        return ResponseEntity.ok(records);
+    }
 }
