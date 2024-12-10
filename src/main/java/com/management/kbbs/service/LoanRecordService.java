@@ -29,10 +29,8 @@ public class LoanRecordService {
     private final LoanRecordRepository loanRecordRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
 
     private final int MAX_LOANS_PER_USER = 6;
-    private final String BORROW_TOPIC = "borrow-topic";
 
     // 新增借閱紀錄(借書)
     @Transactional
@@ -57,10 +55,6 @@ public class LoanRecordService {
 
         bookIO(book, "館外");
 
-        // 發送消息到 Kafka
-        String message = "User " + username + " borrowed book " + bookId;
-        kafkaTemplate.send(BORROW_TOPIC, message);
-
         LoanRecord savedLoanRecord = loanRecordRepository.save(setNewLoadRecord(user, book));
         return convertToDTO(savedLoanRecord);
     }
@@ -73,10 +67,6 @@ public class LoanRecordService {
 
         updateReturnLoadRecord(loanRecord);
         bookIO(loanRecord.getBook(), "館內");
-
-        // 發送還書消息到 Kafka
-        String message = "User " + loanRecord.getUser().getName() + " returned book " + loanRecord.getBook().getId();
-        kafkaTemplate.send("return-topic", message);
 
         LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
         return convertToDTO(updatedLoanRecord);

@@ -23,8 +23,13 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PostMapping("/member/add")
     public ResponseEntity<CommentDTO> createComment(@RequestBody CommentRequestDTO requestDTO) {
-        CommentDTO createdComment = commentService.createComment(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
+        try {
+            CommentDTO createdComment = commentService.createComment(requestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null); // 或返回一個錯誤訊息物件
+        }
     }
 
     // 透過 ID 查詢評論

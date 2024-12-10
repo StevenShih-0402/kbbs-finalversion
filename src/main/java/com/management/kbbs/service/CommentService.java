@@ -8,6 +8,7 @@ import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.CommentRepository;
 
 import com.management.kbbs.repository.UserRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, CommentKafkaDTO> kafkaTemplate;
 
     // 新增一條評論
     public CommentDTO createComment(CommentRequestDTO requestDTO) {
@@ -35,6 +38,11 @@ public class CommentService {
                                   .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
 
         Comment savedComment = commentRepository.save(setNewComment(user, book, requestDTO));
+
+        // 發送事件到 Kafka
+        // 非同步發送 Kafka 消息，快速返回
+        CompletableFuture.runAsync(() -> sendCommentEvent(user, book, requestDTO));
+
         return convertToDTO(savedComment);
     }
 
@@ -142,5 +150,40 @@ public class CommentService {
         searchDTO.setCreatedAt(comment.getCreatedAt());
 
         return searchDTO;
+    }
+
+    private void sendCommentEvent(User user, Book book, CommentRequestDTO requestDTO) {
+        CommentKafkaDTO event = new CommentKafkaDTO(
+                user.getId(),
+                book.getId(),
+                requestDTO.getContent(),
+                requestDTO.getRating(),
+                LocalDateTime.now()
+        );
+
+        try {
+            kafkaTemplate.send("comments", event).get(); // 同步等待
+            System.out.println("Message sent to Kafka successfully");
+        } catch (Exception e) {
+            System.err.println("Failed to send message to Kafka: " + e.getMessage());
+            throw new RuntimeException("Kafka send failed", e);
+        }
+    }
+
+    // 處理新增評論事件的方法
+    public void saveComment(CommentKafkaDTO event) {
+        User user = userRepository.findById(event.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + event.getUserId()));
+        Book book = bookRepository.findById(event.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + event.getBookId()));
+
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.setBook(book);
+        comment.setContent(event.getContent());
+        comment.setRating(event.getRating());
+        comment.setCreatedAt(event.getCreatedAt());
+
+        commentRepository.save(comment);
     }
 }
