@@ -1,5 +1,6 @@
 package com.management.kbbs.controller;
 
+import com.management.kbbs.dto.UserChangePasswordDTO;
 import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.dto.UserLoginDTO;
 import com.management.kbbs.service.UserService;
@@ -76,5 +77,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // 用戶修改密碼
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PatchMapping("/member/changepassword")
+    public ResponseEntity<String> changePasswordByUser(@RequestHeader("Authorization") String token, @RequestBody UserChangePasswordDTO userChangePasswordDTO) {
+        String feedback = userService.changePasswordByUser(token, userChangePasswordDTO);
+        return ResponseEntity.ok(feedback);
     }
 }

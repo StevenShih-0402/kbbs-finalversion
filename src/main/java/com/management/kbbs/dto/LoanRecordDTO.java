@@ -15,10 +15,10 @@ import java.time.LocalDate;
 public class LoanRecordDTO {
 
     private Long id;          // 借閱記錄 ID
-    private User user;      // 使用者
-    private Book book;      // 書籍
     private LocalDate loanDate;    // 借閱日期
     private LocalDate dueDate;     // 應還日期
     private LocalDate returnDate;  // 實際歸還日期
     private String status;    // 借閱狀態
+    private User user;      // 使用者
+    private Book book;      // 書籍
 }

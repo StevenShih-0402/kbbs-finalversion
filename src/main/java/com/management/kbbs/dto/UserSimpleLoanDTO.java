@@ -1,14 +1,11 @@
 package com.management.kbbs.dto;
+// 回傳簡易借閱紀錄給使用者的 DTO
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Data
 @NoArgsConstructor

@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 public class CommentDTO {
 
     private Long id; // 唯一識別每條評論
-    private User user; // 使用者
-    private Book book; // 書籍
     private String content; // 評論內容
     private Integer rating; // 評分（1 到 5）
     private LocalDateTime createdAt; // 評論時間
+    private User user; // 使用者
+    private Book book; // 書籍
 }

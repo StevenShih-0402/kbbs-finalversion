@@ -42,7 +42,8 @@ public interface LoanRecordRepository extends JpaRepository<LoanRecord, Long> {
     @Query("SELECT new com.management.kbbs.dto.BookUnreturnDTO(" +
             "lr.id, lr.book.id, lr.book.title, lr.book.author, lr.user.name, lr.loanDate, lr.dueDate) " +
             "FROM LoanRecord lr " +
-            "WHERE lr.status = '借閱中'")
+            "WHERE lr.status = '借閱中' " +
+            "ORDER BY lr.id DESC ")
     List<BookUnreturnDTO> findUnreturnedBooks();
 
     // 讓使用者查詢簡易的借閱紀錄
@@ -59,7 +60,8 @@ public interface LoanRecordRepository extends JpaRepository<LoanRecord, Long> {
             "FROM LoanRecord lr " +
             "JOIN lr.book b " +
             "JOIN lr.user u " +  // 確保正確使用 'user' 欄位
-            "WHERE u.name = :username")
+            "WHERE u.name = :username " +
+            "ORDER BY lr.id DESC ")
     List<UserSimpleLoanDTO> findSimplifiedLoanRecordsByUserName(@Param("username") String username);
 }
 

@@ -12,5 +12,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByName(String username);
 
-    // 用戶修改密碼
 }

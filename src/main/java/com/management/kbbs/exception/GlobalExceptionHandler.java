@@ -40,4 +40,11 @@ public class GlobalExceptionHandler {
             super(message);
         }
     }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public static class UserNoAuthException extends RuntimeException {
+        public UserNoAuthException(String message) {
+            super(message);
+        }
+    }
 }

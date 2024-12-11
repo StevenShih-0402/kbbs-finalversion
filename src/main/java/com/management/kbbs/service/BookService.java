@@ -6,9 +6,11 @@ import com.management.kbbs.repository.BookRepository;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class BookService {
     }
 
     // 刪除書籍
+    @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
             throw new IllegalArgumentException("未找到指定 ID 的書籍。");

@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,22 +28,22 @@ public class CommentService {
     private final KafkaTemplate<String, CommentKafkaDTO> kafkaTemplate;
 
     // 新增一條評論
-    public CommentDTO createComment(CommentRequestDTO requestDTO) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = userRepository.findByName(username)
-                                  .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
-        Book book = bookRepository.findById(requestDTO.getBookId())
-                                  .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
-
-        Comment savedComment = commentRepository.save(setNewComment(user, book, requestDTO));
-
-        // 發送事件到 Kafka
-        // 非同步發送 Kafka 消息，快速返回
-        CompletableFuture.runAsync(() -> sendCommentEvent(user, book, requestDTO));
-
-        return convertToDTO(savedComment);
-    }
+//    public CommentDTO createComment(CommentRequestDTO requestDTO) {
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//        User user = userRepository.findByName(username)
+//                                  .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
+//        Book book = bookRepository.findById(requestDTO.getBookId())
+//                                  .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
+//
+//        Comment savedComment = commentRepository.save(setNewComment(user, book, requestDTO));
+//
+//        // 發送事件到 Kafka
+//        // 非同步發送 Kafka 消息，快速返回
+//        CompletableFuture.runAsync(() -> sendCommentEvent(user, book, requestDTO));
+//
+//        return convertToDTO(savedComment);
+//    }
 
     // 查詢特定的評論
     public CommentDTO getCommentById(Long id) {
@@ -81,19 +80,19 @@ public class CommentService {
     }
 
     // 查詢特定書籍獲得的評論
-    public List<CommentSearchDTO> getCommentsByBookId(Long bookId) {
+    public List<CommentSearchByBookDTO> getCommentsByBookId(Long bookId) {
         List<Comment> comments = commentRepository.findByBookId(bookId);
         return comments.stream()
-                       .map(this::convertToSearchDTO)
+                       .map(this::convertToSearchBookDTO)
                        .collect(Collectors.toList());
     }
 
 
     // 查詢特定用戶留下的評論
-    public List<CommentSearchDTO> getCommentsByUserId(Long userId) {
+    public List<CommentSearchByUserDTO> getCommentsByUserId(Long userId) {
         List<Comment> comments = commentRepository.findByUserId(userId);
         return comments.stream()
-                       .map(this::convertToSearchDTO)
+                       .map(this::convertToSearchUserDTO)
                        .collect(Collectors.toList());
     }
 
@@ -101,6 +100,14 @@ public class CommentService {
     public List<BookEvaluateDTO> getBookRatings() {
         return commentRepository.findAverageRatingAndCountByBook();
     }
+
+    // 讓用戶查詢個人的簡易的評論資料
+    public List<UserSimpleCommentDTO> getSimplifiedComments() {
+        // 獲取當前登入使用者的名稱
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return commentRepository.findAllCommentsWithBookInfo(username);
+    }
+
 
 
 
@@ -110,11 +117,11 @@ public class CommentService {
         CommentDTO commentDTO = new CommentDTO();
 
         commentDTO.setId(comment.getId());
-        commentDTO.setUser(comment.getUser());
-        commentDTO.setBook(comment.getBook());
         commentDTO.setContent(comment.getContent());
         commentDTO.setRating(comment.getRating());
         commentDTO.setCreatedAt(comment.getCreatedAt());
+        commentDTO.setUser(comment.getUser());
+        commentDTO.setBook(comment.getBook());
 
         return commentDTO;
     }
@@ -122,11 +129,11 @@ public class CommentService {
     // 新增評論的資料轉換
     private Comment setNewComment(User user, Book book, CommentRequestDTO requestDTO){
         Comment comment = new Comment();
-        comment.setUser(user);
-        comment.setBook(book);
         comment.setContent(requestDTO.getContent());
         comment.setRating(requestDTO.getRating());
         comment.setCreatedAt(LocalDateTime.now());
+        comment.setUser(user);
+        comment.setBook(book);
 
         return comment;
     }
@@ -138,11 +145,22 @@ public class CommentService {
     }
 
     // 用 Book / User 的 id 查詢評論的資料轉換
-    private CommentSearchDTO convertToSearchDTO(Comment comment){
-        CommentSearchDTO searchDTO = new CommentSearchDTO();
+    private CommentSearchByBookDTO convertToSearchBookDTO(Comment comment){
+        CommentSearchByBookDTO searchDTO = new CommentSearchByBookDTO();
 
         searchDTO.setId(comment.getId());
         searchDTO.setUserName(comment.getUser().getName());
+        searchDTO.setContent(comment.getContent());
+        searchDTO.setRating(comment.getRating());
+        searchDTO.setCreatedAt(comment.getCreatedAt());
+
+        return searchDTO;
+    }
+
+    private CommentSearchByUserDTO convertToSearchUserDTO(Comment comment){
+        CommentSearchByUserDTO searchDTO = new CommentSearchByUserDTO();
+
+        searchDTO.setId(comment.getId());
         searchDTO.setBookTitle(comment.getBook().getTitle());
         searchDTO.setBookAuthor(comment.getBook().getAuthor());
         searchDTO.setContent(comment.getContent());
@@ -152,38 +170,39 @@ public class CommentService {
         return searchDTO;
     }
 
-    private void sendCommentEvent(User user, Book book, CommentRequestDTO requestDTO) {
-        CommentKafkaDTO event = new CommentKafkaDTO(
-                user.getId(),
-                book.getId(),
-                requestDTO.getContent(),
-                requestDTO.getRating(),
-                LocalDateTime.now()
-        );
-
-        try {
-            kafkaTemplate.send("comments", event).get(); // 同步等待
-            System.out.println("Message sent to Kafka successfully");
-        } catch (Exception e) {
-            System.err.println("Failed to send message to Kafka: " + e.getMessage());
-            throw new RuntimeException("Kafka send failed", e);
-        }
-    }
-
-    // 處理新增評論事件的方法
-    public void saveComment(CommentKafkaDTO event) {
-        User user = userRepository.findById(event.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + event.getUserId()));
-        Book book = bookRepository.findById(event.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + event.getBookId()));
-
-        Comment comment = new Comment();
-        comment.setUser(user);
-        comment.setBook(book);
-        comment.setContent(event.getContent());
-        comment.setRating(event.getRating());
-        comment.setCreatedAt(event.getCreatedAt());
-
-        commentRepository.save(comment);
-    }
+    // 將評論事件發送給 Kafka 的方法
+//    private void sendCommentEvent(User user, Book book, CommentRequestDTO requestDTO) {
+//        CommentKafkaDTO event = new CommentKafkaDTO(
+//                user.getId(),
+//                book.getId(),
+//                requestDTO.getContent(),
+//                requestDTO.getRating(),
+//                LocalDateTime.now()
+//        );
+//
+//        try {
+//            kafkaTemplate.send("comments", event).get(); // 同步等待
+//            System.out.println("Message sent to Kafka successfully");
+//        } catch (Exception e) {
+//            System.err.println("Failed to send message to Kafka: " + e.getMessage());
+//            throw new RuntimeException("Kafka send failed", e);
+//        }
+//    }
+//
+//    // 處理新增評論事件的方法
+//    public void saveComment(CommentKafkaDTO event) {
+//        User user = userRepository.findById(event.getUserId())
+//                .orElseThrow(() -> new RuntimeException("User not found with ID: " + event.getUserId()));
+//        Book book = bookRepository.findById(event.getBookId())
+//                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + event.getBookId()));
+//
+//        Comment comment = new Comment();
+//        comment.setUser(user);
+//        comment.setBook(book);
+//        comment.setContent(event.getContent());
+//        comment.setRating(event.getRating());
+//        comment.setCreatedAt(event.getCreatedAt());
+//
+//        commentRepository.save(comment);
+//    }
 }

@@ -141,12 +141,12 @@ public class LoanRecordService {
         LoanRecordDTO loanRecordDTO = new LoanRecordDTO();
 
         loanRecordDTO.setId(loanrecord.getId());
-        loanRecordDTO.setUser(loanrecord.getUser());
-        loanRecordDTO.setBook(loanrecord.getBook());
         loanRecordDTO.setLoanDate(loanrecord.getLoanDate());
         loanRecordDTO.setDueDate(loanrecord.getDueDate());
         loanRecordDTO.setReturnDate(loanrecord.getReturnDate());
         loanRecordDTO.setStatus(loanrecord.getStatus());
+        loanRecordDTO.setUser(loanrecord.getUser());
+        loanRecordDTO.setBook(loanrecord.getBook());
 
         return loanRecordDTO;
     }
@@ -154,11 +154,11 @@ public class LoanRecordService {
     // 借書的資料轉換
     private LoanRecord setNewLoadRecord(User user, Book book){
         LoanRecord loanRecord = new LoanRecord();
-        loanRecord.setUser(user);
-        loanRecord.setBook(book);
         loanRecord.setLoanDate(LocalDate.now());
         loanRecord.setDueDate(LocalDate.now().plusWeeks(3));
         loanRecord.setStatus("借閱中");
+        loanRecord.setUser(user);
+        loanRecord.setBook(book);
 
         return loanRecord;
     }

@@ -37,11 +37,11 @@ public class Book {
     @Column(nullable = false)
     private String collection = "館內"; // 館藏狀態，預設值為 "館內"
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<LoanRecord> loanRecords = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Comment> comments = new ArrayList<>();
 }

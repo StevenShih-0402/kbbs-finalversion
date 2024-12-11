@@ -1,5 +1,6 @@
 package com.management.kbbs.service;
 
+import com.management.kbbs.dto.UserChangePasswordDTO;
 import com.management.kbbs.dto.UserDTO;
 import com.management.kbbs.dto.UserLoginDTO;
 import com.management.kbbs.entity.User;
@@ -9,6 +10,7 @@ import com.management.kbbs.security.JwtTokenProvider;
 import com.management.kbbs.security.TokenStore;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +33,6 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenStore tokenStore;
 
-//    private final PasswordEncoder passwordEncoder;
-//    private final JwtUtil jwtUtil;
-//    private final Map<String, String> tokenStore = new HashMap<>(); // 用來模擬登出的 token 清除
-
-    // 創建用戶
-//    public UserDTO createUser(UserDTO userDTO) {
-//        User savedUser = userRepository.save(setNewUser(userDTO));
-//        return convertToDTO(savedUser);
-//    }
 
     // 註冊新的用戶
     @Transactional
@@ -82,6 +75,7 @@ public class UserService {
     }
 
     // 用戶登出
+    @Transactional
     public String logoutUser(String token) {
         // 假設 Token 格式是 "Bearer <actual_token>"
         if (token.startsWith("Bearer ")) {
@@ -123,6 +117,7 @@ public class UserService {
     }
 
     // 刪除用戶
+    @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with id: " + id);  // 或者可以自訂異常處理
@@ -130,7 +125,29 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    // 用戶修改密碼
+    // 讓用戶修改個人的密碼
+    @Transactional
+    public String changePasswordByUser(String token, UserChangePasswordDTO userChangePasswordDTO){
+        // 獲取當前登入使用者的名稱
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
+
+        user.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
+        userRepository.save(user);
+
+        // 修改密碼後自動讓使用者登出，假設 Token 格式是 "Bearer <actual_token>"
+        if (token.startsWith("Bearer ")) {
+            String actualToken = token.substring(7);
+
+            // 從 Redis 中刪除該 Token
+            redisTemplate.delete(actualToken);
+        }
+
+        return "密碼修改成功！請重新登入！";
+    }
+
 
 
 
