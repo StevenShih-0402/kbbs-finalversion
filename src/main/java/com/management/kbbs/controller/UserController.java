@@ -21,13 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // 創建用戶
-//    @PostMapping
-//    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-//        UserDTO createdUser = userService.createUser(userDTO);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-//    }
-
     // 註冊
     @PostMapping("/public/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
@@ -42,7 +35,7 @@ public class UserController {
 
     // 登出
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @PostMapping("/logout")
+    @PostMapping("/member/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(userService.logoutUser(token));
     }

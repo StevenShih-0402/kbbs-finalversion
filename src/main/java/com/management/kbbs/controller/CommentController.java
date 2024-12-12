@@ -8,6 +8,8 @@ import com.management.kbbs.repository.CommentRepository;
 import com.management.kbbs.repository.UserRepository;
 import com.management.kbbs.service.CommentService;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +28,13 @@ public class CommentController {
     private final UserRepository userRepository;
     private final CommentService commentService;
     private final CommentRepository commentRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
     // 新增評論
 //    @PreAuthorize("hasRole('ROLE_MEMBER')")
@@ -39,6 +48,16 @@ public class CommentController {
 //                    .body(null); // 或返回一個錯誤訊息物件
 //        }
 //    }
+
+    // 新增評論 (in RabbitMQ)
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    @PostMapping("/member/add")
+    public ResponseEntity<String> createComment(@RequestBody CommentRequestDTO requestDTO) {
+        // 發送請求數據到 RabbitMQ
+        requestDTO.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, requestDTO);
+        return ResponseEntity.ok("評論新增完成！");
+    }
 
     // 透過 ID 查詢評論
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -113,7 +132,7 @@ public class CommentController {
         }
 
         CommentDTO updatedComment = commentService.updateComment(id, updateDTO);
-        return ResponseEntity.ok(updatedComment);
+        return ResponseEntity.ok("評論已修改成以下內容：「" + updatedComment.getContent() + "」！");
     }
 
     // 列出簡易的個人評論清單

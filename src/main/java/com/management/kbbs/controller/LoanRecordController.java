@@ -22,17 +22,17 @@ public class LoanRecordController {
     // 借書
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PostMapping("/member/borrow/{bookId}")
-    public ResponseEntity<LoanRecordDTO> borrowBook(@PathVariable Long bookId) {
-        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(bookId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createLoanRecord);
+    public ResponseEntity<String> borrowBook(@PathVariable Long bookId) {
+//        LoanRecordDTO createLoanRecord = loanRecordService.borrowBook(bookId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(loanRecordService.borrowBook(bookId));
     }
 
     // 還書
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PatchMapping("/member/return/{loanrecordId}")
-    public ResponseEntity<LoanRecordDTO> returnBook(@PathVariable Long loanrecordId) {
-        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanrecordId);
-        return ResponseEntity.ok(updateLoanRecord);
+    public ResponseEntity<String> returnBook(@PathVariable Long loanrecordId) {
+//        LoanRecordDTO updateLoanRecord = loanRecordService.returnBook(loanrecordId);
+        return ResponseEntity.ok(loanRecordService.returnBook(loanrecordId));
     }
 
     // 查詢所有借閱紀錄

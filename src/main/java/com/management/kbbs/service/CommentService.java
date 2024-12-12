@@ -8,11 +8,12 @@ import com.management.kbbs.repository.BookRepository;
 import com.management.kbbs.repository.CommentRepository;
 
 import com.management.kbbs.repository.UserRepository;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final KafkaTemplate<String, CommentKafkaDTO> kafkaTemplate;
 
     // 新增一條評論
 //    public CommentDTO createComment(CommentRequestDTO requestDTO) {
@@ -44,6 +44,19 @@ public class CommentService {
 //
 //        return convertToDTO(savedComment);
 //    }
+
+    // 新增一條評論 (in RabbitMQ)
+    @RabbitListener(queues = "${rabbitmq.queue.name}")
+    @Transactional
+    public void handleCommentRequest(CommentRequestDTO requestDTO) {
+        User user = userRepository.findByName(requestDTO.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found with User: " + requestDTO.getUsername()));
+        Book book = bookRepository.findById(requestDTO.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + requestDTO.getBookId()));
+
+        Comment savedComment = commentRepository.save(setNewComment(user, book, requestDTO));
+        // 可以根據需求進一步處理 savedComment，比如記錄日誌或發送通知
+    }
 
     // 查詢特定的評論
     public CommentDTO getCommentById(Long id) {

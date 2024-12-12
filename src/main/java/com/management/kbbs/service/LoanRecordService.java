@@ -12,13 +12,13 @@ import com.management.kbbs.repository.UserRepository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +34,7 @@ public class LoanRecordService {
 
     // 新增借閱紀錄(借書)
     @Transactional
-    public LoanRecordDTO borrowBook(Long bookId) {
+    public String borrowBook(Long bookId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByName(username)
@@ -56,12 +56,13 @@ public class LoanRecordService {
         bookIO(book, "館外");
 
         LoanRecord savedLoanRecord = loanRecordRepository.save(setNewLoadRecord(user, book));
-        return convertToDTO(savedLoanRecord);
+//        return convertToDTO(savedLoanRecord);
+        return "借閱者 " + savedLoanRecord.getUser().getName()  + " 已完成 《" + savedLoanRecord.getBook().getTitle() + "》 的借閱！請於 " + LocalDate.now().plusWeeks(3) + " 前完成歸還！";
     }
 
     // 更新借閱紀錄(還書)
     @Transactional
-    public LoanRecordDTO returnBook(Long id) {
+    public String returnBook(Long id) {
         LoanRecord loanRecord = loanRecordRepository.findById(id)
                                                     .orElseThrow(() -> new RuntimeException("Loan record not found with ID: " + id));
 
@@ -69,7 +70,8 @@ public class LoanRecordService {
         bookIO(loanRecord.getBook(), "館內");
 
         LoanRecord updatedLoanRecord = loanRecordRepository.save(loanRecord);
-        return convertToDTO(updatedLoanRecord);
+//        return convertToDTO(updatedLoanRecord);
+        return "借閱者 " + updatedLoanRecord.getUser().getName() + " 已完成 《" + updatedLoanRecord.getBook().getTitle() + "》 的歸還！謝謝您！";
     }
 
     // 查詢所有借閱紀錄
