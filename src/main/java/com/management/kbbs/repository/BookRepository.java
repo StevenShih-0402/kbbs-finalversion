@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
@@ -14,12 +14,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByIsbn(String isbn);
 
     // 根據書名進行模糊查詢
-    List<Book> findByTitleContaining(String title);
+    Optional<Book> findByTitleContaining(String title);
 
     // 查詢存貨大於指定數量的書籍
-    List<Book> findByStockGreaterThan(Integer stock);
+    Optional<Book> findByStockGreaterThan(Integer stock);
 
     // 使用自定義 SQL 進行 JOIN 查詢 (範例)
     @Query("SELECT b FROM Book b JOIN FETCH b.author WHERE b.stock > :stock")
-    List<Book> findBooksWithAuthorAndStockGreaterThan(Integer stock);
+    Optional<Book> findBooksWithAuthorAndStockGreaterThan(Integer stock);
 }

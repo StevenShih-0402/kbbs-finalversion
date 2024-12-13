@@ -2,7 +2,6 @@ package com.management.kbbs.service;
 
 import com.management.kbbs.entity.Book;
 import com.management.kbbs.repository.BookRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,15 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
 
-//    @Autowired
-//    public BookService(BookRepository bookRepository) {
-//        this.bookRepository = bookRepository;
-//    }
+    @Autowired
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
     // 新增書籍
     public Book addBook(Book book) {
