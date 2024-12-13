@@ -77,6 +77,7 @@ public class CommentService {
     }
 
     // 刪除一條評論
+    @Transactional
     public void deleteComment(Long id) {
         if (!commentRepository.existsById(id)) {
             throw new RuntimeException("Comment not found with ID: " + id);

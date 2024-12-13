@@ -129,10 +129,10 @@ public class UserService {
     @Transactional
     public String changePasswordByUser(String token, UserChangePasswordDTO userChangePasswordDTO){
         // 獲取當前登入使用者的名稱
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new RuntimeException("User not found with User: " + username));
+        User user = userRepository.findByName(userChangePasswordDTO.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found with User: " + userChangePasswordDTO.getUsername()));
 
         user.setPassword(passwordEncoder.encode(userChangePasswordDTO.getNewPassword()));
         userRepository.save(user);
@@ -145,7 +145,7 @@ public class UserService {
             redisTemplate.delete(actualToken);
         }
 
-        return "密碼修改成功！請重新登入！";
+        return "密碼修改成功！";
     }
 
 

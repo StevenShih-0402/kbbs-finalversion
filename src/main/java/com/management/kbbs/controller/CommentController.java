@@ -132,7 +132,7 @@ public class CommentController {
         }
 
         CommentDTO updatedComment = commentService.updateComment(id, updateDTO);
-        return ResponseEntity.ok("評論已修改成以下內容：「" + updatedComment.getContent() + "」！");
+        return ResponseEntity.ok("評論已修改成以下內容：「" + updatedComment.getContent() + "」");
     }
 
     // 列出簡易的個人評論清單

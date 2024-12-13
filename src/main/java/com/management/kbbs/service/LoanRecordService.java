@@ -101,6 +101,7 @@ public class LoanRecordService {
     }
 
     // 刪除借閱紀錄
+    @Transactional
     public void deleteLoanRecord(Long id) {
         if (!loanRecordRepository.existsById(id)) {
             throw new RuntimeException("Loan record not found with ID: " + id);

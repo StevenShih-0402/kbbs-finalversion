@@ -73,8 +73,7 @@ public class UserController {
     }
 
     // 用戶修改密碼
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @PatchMapping("/member/changepassword")
+    @PatchMapping("/public/changepassword")
     public ResponseEntity<String> changePasswordByUser(@RequestHeader("Authorization") String token, @RequestBody UserChangePasswordDTO userChangePasswordDTO) {
         String feedback = userService.changePasswordByUser(token, userChangePasswordDTO);
         return ResponseEntity.ok(feedback);
