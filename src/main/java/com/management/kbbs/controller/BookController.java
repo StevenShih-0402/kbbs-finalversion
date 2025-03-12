@@ -1,71 +1,68 @@
 package com.management.kbbs.controller;
 
-import com.management.kbbs.entity.Book;
+import com.management.kbbs.dto.BookDTO;
 import com.management.kbbs.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
 
-    @Autowired
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
-
     // 新增書籍
-    @PostMapping
-    public ResponseEntity<Book> addBook(@RequestBody Book book) {
-        Book createdBook = bookService.addBook(book);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/admin/add")
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
+        BookDTO createdBook = bookService.createBook(bookDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 
+
     // 查詢所有書籍
-    @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        List<Book> books = bookService.getAllBooks();
+    @GetMapping("/public")
+    public ResponseEntity<List<BookDTO>> getAllBooks() {
+        List<BookDTO> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
     // 根據 ID 查詢書籍
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Book book = bookService.getBookById(id);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        BookDTO book = bookService.getBookById(id);
         return ResponseEntity.ok(book);
     }
 
     // 更新書籍
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
-        Book book = bookService.updateBook(id, updatedBook);
-        return ResponseEntity.ok(book);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/admin/update/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+        BookDTO updatedBook = bookService.updateBook(id, bookDTO);
+        return ResponseEntity.ok(updatedBook);
     }
 
     // 刪除書籍
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
 
-    // 根據書名查詢書籍
-    @GetMapping("/search")
-    public ResponseEntity<List<Book>> searchBooksByTitle(@RequestParam String keyword) {
-        List<Book> books = bookService.searchBooksByTitle(keyword);
-        return ResponseEntity.ok(books);
-    }
-
-    // 查詢存貨大於指定數量的書籍
-    @GetMapping("/stock")
-    public ResponseEntity<List<Book>> getBooksByStockGreaterThan(@RequestParam Integer stock) {
-        List<Book> books = bookService.getBooksByStockGreaterThan(stock);
+    // 根據關鍵字查詢書籍 (書名包含特定字串)
+    @GetMapping("/public/search")
+    public ResponseEntity<List<BookDTO>> searchBooksByTitle(@RequestParam String keyword) {
+        List<BookDTO> books = bookService.searchBooksByTitle(keyword);
         return ResponseEntity.ok(books);
     }
 }

@@ -1,102 +1,47 @@
 package com.management.kbbs.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "Books")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String author;
 
-    @Column(unique = true, length = 20)
+    @Column(unique = true)
     private String isbn;
 
-    @Column(name = "publish_date")
     private LocalDate publishDate;
 
-    @Column(columnDefinition = "NUMBER DEFAULT 0")
-    private Integer stock;
+    @Column(nullable = false)
+    private String collection = "館內"; // 館藏狀態，預設值為 "館內"
 
-    // Constructors
-    public Book() {
-    }
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<LoanRecord> loanRecords = new ArrayList<>();
 
-    public Book(String title, String author, String isbn, LocalDate publishDate, Integer stock) {
-        this.title = title;
-        this.author = author;
-        this.isbn = isbn;
-        this.publishDate = publishDate;
-        this.stock = stock;
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
-    public LocalDate getPublishDate() {
-        return publishDate;
-    }
-
-    public void setPublishDate(LocalDate publishDate) {
-        this.publishDate = publishDate;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    // toString method (optional, for debugging/logging purposes)
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", isbn='" + isbn + '\'' +
-                ", publishDate=" + publishDate +
-                ", stock=" + stock +
-                '}';
-    }
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Comment> comments = new ArrayList<>();
 }

@@ -1,8 +1,8 @@
 package com.management.kbbs.exception;
 
+import org.springframework.ui.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,5 +31,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + ex.getMessage());
+    }
+
+    // 借閱數量超過上限的錯誤回報
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class BorrowLimitException extends RuntimeException {
+        public BorrowLimitException(String message) {
+            super(message);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public static class UserNoAuthException extends RuntimeException {
+        public UserNoAuthException(String message) {
+            super(message);
+        }
     }
 }
